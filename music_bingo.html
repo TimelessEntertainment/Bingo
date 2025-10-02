@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Music Bingo</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 { margin-top: 20px; }
+
+        .player-controls {
+            margin: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            margin: 0 10px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            background: #6a5acd;
+            transition: 0.3s;
+        }
+
+        button:hover { background: #836fff; }
+
+        #current-song {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+
+        .bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 80px);
+            grid-template-rows: repeat(5, 80px);
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .bingo-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .bingo-cell.marked { background: rgba(0,0,0,0.7); }
+    </style>
+</head>
+<body>
+    <h1>Music Bingo</h1>
+
+    <div class="player-controls">
+        <button id="start-btn">Start</button>
+        <button id="next-btn">Next</button>
+        <button id="pause-btn">Pause</button>
+        <div id="current-song">Current Song: None</div>
+    </div>
+
+    <div class="bingo-grid" id="bingo-grid">
+        <!-- 5x5 Bingo cells -->
+    </div>
+
+    <audio id="audio-player" controls style="display:none;"></audio>
+
+    <script>
+        const audioPlayer = document.getElementById("audio-player");
+        const startBtn = document.getElementById("start-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const pauseBtn = document.getElementById("pause-btn");
+        const currentSong = document.getElementById("current-song");
+
+        const musicFolder = "music/"; // your folder name
+        let songs = []; // will hold file names
+
+        // Populate songs array with all mp3s
+        // Example: '12345.mp3', '67890.mp3' (replace with your actual file names)
+        // For now, we'll simulate with placeholder numbers:
+        for (let i = 1; i <= 20; i++) {
+            songs.push(i + ".mp3"); // replace with actual files or script to read them
+        }
+
+        let currentIndex = 0;
+
+        function getRandomSong() {
+            const index = Math.floor(Math.random() * songs.length);
+            currentIndex = index;
+            return songs[index];
+        }
+
+        function playSong(songFile) {
+            audioPlayer.src = musicFolder + songFile;
+            audioPlayer.play();
+            currentSong.textContent = "Current Song: " + songFile;
+        }
+
+        startBtn.addEventListener("click", () => {
+            const song = getRandomSong();
+            playSong(song);
+        });
+
+        nextBtn.addEventListener("click", () => {
+            const song = getRandomSong();
+            playSong(song);
+        });
+
+        pauseBtn.addEventListener("click", () => {
+            audioPlayer.pause();
+        });
+
+        // Generate bingo grid
+        const grid = document.getElementById("bingo-grid");
+        for (let i = 0; i < 25; i++) {
+            const cell = document.createElement("div");
+            cell.className = "bingo-cell";
+            cell.textContent = i + 1; // placeholder number
+            cell.addEventListener("click", () => {
+                cell.classList.toggle("marked");
+            });
+            grid.appendChild(cell);
+        }
+    </script>
+</body>
+</html>
