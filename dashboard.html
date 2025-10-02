@@ -4,13 +4,126 @@
     <meta charset="UTF-8">
     <title>Dashboard - Music Bingo</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        h1 {
+            margin-top: 50px;
+            font-size: 3em;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 80px;
+            width: 300px;
+        }
+
+        .game-btn {
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .music-bingo {
+            background-color: #ff7f50; /* coral */
+            color: white;
+        }
+
+        .bdsm-trivia {
+            background-color: #6a5acd; /* slate blue */
+            color: white;
+        }
+
+        .bingo {
+            background-color: #20b2aa; /* light sea green */
+            color: white;
+        }
+
+        .logout-btn {
+            margin-top: 50px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #ff4c4c;
+            color: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .logout-btn:hover {
+            background-color: #ff1a1a;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Welcome to Music Bingo Dashboard!</h2>
-        <p>You are successfully logged in.</p>
-        <button id="logout-btn">Logout</button>
+    <h1 id="welcome-text">Welcome!</h1>
+
+    <div class="buttons-container">
+        <button class="game-btn music-bingo" onclick="location.href='music_bingo.html'">Music Bingo</button>
+        <button class="game-btn bdsm-trivia" onclick="location.href='bdsm_trivia.html'">BDSM Trivia</button>
+        <button class="game-btn bingo" onclick="alert('Coming Soon!')">Bingo</button>
     </div>
-    <script type="module" src="script.js"></script>
+
+    <button class="logout-btn" id="logout-btn">Logout</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCizkQLkKhxlQSRZ7J378jLDVlqPdadu78",
+            authDomain: "music-bingo-login.firebaseapp.com",
+            projectId: "music-bingo-login",
+            storageBucket: "music-bingo-login.firebasestorage.app",
+            messagingSenderId: "814220049067",
+            appId: "1:814220049067:web:b7a771786e67e9bfa055ee"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const welcomeText = document.getElementById("welcome-text");
+        const logoutBtn = document.getElementById("logout-btn");
+
+        // Check auth state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                welcomeText.textContent = `Welcome, ${user.email}!`;
+            } else {
+                // No user logged in, redirect to login
+                window.location.href = "login.html";
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener("click", () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            });
+        });
+    </script>
 </body>
 </html>
