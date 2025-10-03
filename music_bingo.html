@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Music Bingo</title>
-<link href="style.css" rel="stylesheet">
 <style>
     body {
         background-color: #1a1a1a;
@@ -40,22 +39,20 @@
         padding: 20px;
         gap: 20px;
     }
-    .playlist-container {
-        flex: 2;
+    .playlist-container, .card-checker {
         background-color: #2a2a2a;
         padding: 20px;
         border-radius: 15px;
     }
-    .playlist-container h2 {
+    .playlist-container {
+        flex: 2;
+    }
+    .card-checker {
+        flex: 1;
+    }
+    h2 {
         color: #ff3366;
         margin-bottom: 10px;
-    }
-    select {
-        font-size: 16px;
-        padding: 6px;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        border: none;
     }
     ul.playlist {
         list-style: none;
@@ -74,22 +71,23 @@
         background-color: #ff3366;
         color: #000;
     }
-    .card-checker {
-        flex: 1;
-        background-color: #2a2a2a;
-        padding: 20px;
-        border-radius: 15px;
-    }
-    .card-checker h2 {
-        color: #ff3366;
-    }
-    .card-checker input[type="text"] {
+    input[type="text"], button {
         width: 100%;
         padding: 10px;
-        font-size: 16px;
         margin-top: 10px;
+        font-size: 16px;
         border-radius: 8px;
         border: none;
+        cursor: pointer;
+    }
+    button {
+        background-color: #ff3366;
+        color: #fff;
+    }
+    audio {
+        width: 100%;
+        margin-bottom: 10px;
+        outline: none;
     }
     .card-display {
         margin-top: 20px;
@@ -99,24 +97,10 @@
         max-height: 300px;
         overflow-y: auto;
     }
-    audio {
-        width: 100%;
-        margin-bottom: 10px;
-        outline: none;
-    }
-    button {
-        padding: 10px 15px;
-        font-size: 16px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        background-color: #ff3366;
-        color: #fff;
-        margin-top: 10px;
-    }
 </style>
 </head>
 <body>
+
 <header>
     <h1>Welcome Mike!</h1>
     <div class="datetime" id="datetime"></div>
@@ -133,10 +117,8 @@
 
     <div class="card-checker">
         <h2>Card Checker</h2>
-        <p>Enter card number to check:</p>
         <input type="text" id="cardNumber" placeholder="Card #">
         <button id="checkCard">Check</button>
-
         <div class="card-display" id="cardDisplay">
             <p>No card selected.</p>
         </div>
@@ -152,13 +134,13 @@ function updateDatetime() {
 setInterval(updateDatetime, 1000);
 updateDatetime();
 
-// Card checker (mock)
+// Mock card checker
 document.getElementById('checkCard').addEventListener('click', () => {
     const cardNum = document.getElementById('cardNumber').value;
     document.getElementById('cardDisplay').innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
 });
 
-// --------- 00s JSON Playlist ---------
+// ----------- Load 00s JSON Playlist -----------
 let songs00s = [];
 
 fetch("00s_songs.json")
