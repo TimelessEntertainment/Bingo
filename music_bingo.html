@@ -99,7 +99,7 @@
     }
 
     .bingo-section {
-      width: 250px;
+      width: 300px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -133,33 +133,32 @@
     .bingo-placeholder {
       background-color: #1e1e1e;
       border-radius: 12px;
-      padding: 10px;
+      padding: 15px;
       width: 100%;
-      min-height: 250px;
-      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-auto-rows: 60px;
+      gap: 5px;
       border: 2px solid #00ffff;
+      overflow-y: visible;
     }
 
-    .played {
+    .bingo-placeholder div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #1e1e1e;
+      border: 1px solid #ff0099;
+      border-radius: 6px;
+      padding: 5px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .bingo-placeholder div.played {
       background-color: #ff0099;
       color: #fff;
       font-weight: bold;
-      border-radius: 4px;
-      padding: 2px 6px;
-      margin: 2px 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    td {
-      border: 1px solid #ff0099;
-      text-align: center;
-      padding: 5px;
-      font-size: 12px;
-      border-radius: 4px;
     }
 
     /* Scrollbar style */
@@ -210,16 +209,16 @@
     const bingoPlaceholder = document.querySelector('.bingo-placeholder');
 
     let playedSongs = [];
+
     let bingoCards = {};
 
-    // Load generated cards JSON
+    // Load cards JSON
     fetch('00s_cards.json')
-      .then(res => res.json())
-      .then(data => {
-        bingoCards = data;
-        console.log('Bingo cards loaded:', Object.keys(bingoCards).length);
+      .then(response => response.json())
+      .then(cards => {
+        bingoCards = cards;
       })
-      .catch(err => console.error('Failed to load bingo cards:', err));
+      .catch(err => console.error('Error loading bingo cards:', err));
 
     // Load playlist
     function loadPlaylist(category) {
@@ -228,7 +227,7 @@
         .then(response => response.json())
         .then(songs => {
           playlistContainer.innerHTML = '';
-          songs.forEach((song, index) => {
+          songs.forEach((song) => {
             const item = document.createElement('div');
             item.classList.add('playlist-item');
             item.textContent = `${song.title} - ${song.artist}`;
@@ -241,16 +240,15 @@
               document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
               item.classList.add('active');
 
-              // Track played songs
               if(!playedSongs.includes(song.title)) {
                 playedSongs.push(song.title);
+                highlightCard();
               }
             });
 
             playlistContainer.appendChild(item);
           });
 
-          // Auto-load first song
           if(songs.length > 0) {
             audioPlayer.src = songs[0].file;
             playlistContainer.firstChild.classList.add('active');
@@ -267,46 +265,28 @@
 
     loadPlaylist(categoryDropdown.value);
 
-    // Category change
     categoryDropdown.addEventListener('change', () => {
       playedSongs = [];
       loadPlaylist(categoryDropdown.value);
     });
 
-    // Check card
-    checkCardButton.addEventListener('click', () => {
+    function highlightCard() {
       const cardNumber = cardNumberInput.value.trim();
-      if(cardNumber === '') {
-        alert('Please enter a card number');
-        return;
-      }
+      if(!cardNumber || !bingoCards[cardNumber]) return;
 
       const card = bingoCards[cardNumber];
-      if(!card) {
-        alert('Card not found!');
-        bingoPlaceholder.innerHTML = '';
-        return;
+      let html = '';
+      for(let r = 0; r < card.length; r++){
+        for(let c = 0; c < card[r].length; c++){
+          const title = card[r][c];
+          const playedClass = playedSongs.includes(title) ? 'played' : '';
+          html += `<div class="${playedClass}">${title}</div>`;
+        }
       }
+      bingoPlaceholder.innerHTML = html;
+    }
 
-      const table = document.createElement('table');
-
-      card.forEach(row => {
-        const tr = document.createElement('tr');
-        row.forEach(cell => {
-          const td = document.createElement('td');
-          td.textContent = cell;
-          td.style.backgroundColor = (cell === 'FREE') ? 'lightgreen' :
-                                     (playedSongs.includes(cell)) ? '#ff0099' : '#1e1e1e';
-          td.style.color = (cell === 'FREE' || playedSongs.includes(cell)) ? '#121212' : '#f0f0f0';
-          tr.appendChild(td);
-        });
-        table.appendChild(tr);
-      });
-
-      bingoPlaceholder.innerHTML = '';
-      bingoPlaceholder.appendChild(table);
-    });
+    checkCardButton.addEventListener('click', highlightCard);
   </script>
-
 </body>
 </html>
