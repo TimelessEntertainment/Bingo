@@ -15,13 +15,11 @@
     /* Top bar */
     .top-bar {
         background: linear-gradient(90deg, #8b0000, #ff4500);
-        padding: 20px;
+        padding: 20px 40px;
         display: flex;
-        justify-content: flex-start;
+        justify-content: space-between;
         align-items: center;
-        gap: 40px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-        flex-wrap: wrap;
     }
 
     .welcome {
@@ -35,12 +33,15 @@
         color: #fff;
     }
 
+    /* Games container */
     .games-container {
-        display: flex;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        justify-items: center;
         gap: 50px;
-        margin-top: 50px;
-        flex-wrap: wrap;
+        margin: 60px auto;
+        width: 90%;
+        max-width: 1200px;
     }
 
     .game-btn {
