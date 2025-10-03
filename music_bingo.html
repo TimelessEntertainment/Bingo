@@ -32,15 +32,28 @@
       font-family: 'Fredoka One', cursive;
       font-size: 1.8rem;
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
     header .welcome {
       font-size: 1.1rem;
     }
 
+    header select {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #1e1e1e;
+      color: #fff;
+    }
+
     main {
       display: flex;
-      justify-content: center;
+      justify-content: flex-start; /* shift everything left */
       padding: 20px;
       gap: 20px;
     }
@@ -131,7 +144,13 @@
 
   <header>
     <div class="welcome">Welcome Mike</div>
-    <h1>Music Bingo - 00s</h1>
+    <h1>
+      Music Bingo - 00s
+      <select id="categoryDropdown">
+        <option value="00s">00s</option>
+        <!-- future categories can be added here -->
+      </select>
+    </h1>
   </header>
 
   <main>
@@ -147,40 +166,50 @@
   </main>
 
   <script>
-    // --- Load playlist from JSON ---
-    fetch('00s_songs.json')
-      .then(response => response.json())
-      .then(songs => {
-        const playlistContainer = document.getElementById('playlist');
-        const audioPlayer = document.getElementById('audioPlayer');
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const playlistContainer = document.getElementById('playlist');
 
-        songs.forEach((song, index) => {
-          const item = document.createElement('div');
-          item.classList.add('playlist-item');
-          item.textContent = `${song.title} - ${song.artist}`;
-          item.dataset.file = song.file;
+    function loadPlaylist(category) {
+      fetch(`${category}_songs.json`)
+        .then(response => response.json())
+        .then(songs => {
+          playlistContainer.innerHTML = ''; // clear previous
+          songs.forEach((song, index) => {
+            const item = document.createElement('div');
+            item.classList.add('playlist-item');
+            item.textContent = `${song.title} - ${song.artist}`;
+            item.dataset.file = song.file;
 
-          item.addEventListener('click', () => {
-            audioPlayer.src = song.file;
-            audioPlayer.play();
-            document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
+            item.addEventListener('click', () => {
+              audioPlayer.src = song.file;
+              audioPlayer.play();
+              document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
+              item.classList.add('active');
+            });
+
+            playlistContainer.appendChild(item);
           });
 
-          playlistContainer.appendChild(item);
+          // Auto-load first song
+          if(songs.length > 0) {
+            audioPlayer.src = songs[0].file;
+            playlistContainer.firstChild.classList.add('active');
+          }
+        })
+        .catch(err => {
+          console.error('Error loading playlist:', err);
+          playlistContainer.textContent = 'Failed to load playlist';
         });
+    }
 
-        // Auto-load first song
-        if(songs.length > 0) {
-          audioPlayer.src = songs[0].file;
-          playlistContainer.firstChild.classList.add('active');
-        }
-      })
-      .catch(err => {
-        console.error('Error loading playlist:', err);
-        const playlistContainer = document.getElementById('playlist');
-        playlistContainer.textContent = 'Failed to load playlist';
-      });
+    // Initial load
+    loadPlaylist(categoryDropdown.value);
+
+    // Handle category change
+    categoryDropdown.addEventListener('change', () => {
+      loadPlaylist(categoryDropdown.value);
+    });
   </script>
 
 </body>
