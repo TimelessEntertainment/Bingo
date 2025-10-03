@@ -38,27 +38,21 @@
         justify-content: center;
         padding: 20px;
         gap: 20px;
+        flex-wrap: wrap;
     }
     .playlist-container, .card-checker {
         background-color: #2a2a2a;
         padding: 20px;
         border-radius: 15px;
     }
-    .playlist-container {
-        flex: 2;
-    }
-    .card-checker {
-        flex: 1;
-    }
-    h2 {
-        color: #ff3366;
-        margin-bottom: 10px;
-    }
+    .playlist-container { flex: 2; min-width: 300px; }
+    .card-checker { flex: 1; min-width: 250px; }
+    h2 { color: #ff3366; margin-bottom: 10px; }
     ul.playlist {
         list-style: none;
         padding: 0;
         max-height: 300px;
-        overflow-y: scroll;
+        overflow-y: auto;
         border: 1px solid #444;
         border-radius: 8px;
     }
@@ -80,15 +74,8 @@
         border: none;
         cursor: pointer;
     }
-    button {
-        background-color: #ff3366;
-        color: #fff;
-    }
-    audio {
-        width: 100%;
-        margin-bottom: 10px;
-        outline: none;
-    }
+    button { background-color: #ff3366; color: #fff; }
+    audio { width: 100%; margin-bottom: 10px; outline: none; }
     .card-display {
         margin-top: 20px;
         background-color: #111;
@@ -134,21 +121,21 @@ function updateDatetime() {
 setInterval(updateDatetime, 1000);
 updateDatetime();
 
-// Mock card checker
+// Card checker (mock)
 document.getElementById('checkCard').addEventListener('click', () => {
     const cardNum = document.getElementById('cardNumber').value;
     document.getElementById('cardDisplay').innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
 });
 
-// 00s Songs embedded directly
-const songs00s = [
-    { "title": "Oops!... I Did It Again", "artist": "Britney Spears", "file": "00s/01_oops.mp3" },
-    { "title": "Bye Bye Bye", "artist": "NSYNC", "file": "00s/02_bye_bye_bye.mp3" },
-    { "title": "Genie in a Bottle", "artist": "Christina Aguilera", "file": "00s/03_genie.mp3" },
-    { "title": "I Want It That Way", "artist": "Backstreet Boys", "file": "00s/04_i_want_it_that_way.mp3" },
-    { "title": "Torn", "artist": "Natalie Imbruglia", "file": "00s/05_torn.mp3" }
-    // Add more songs here, making sure filenames match your 00s folder
-];
+// Load songs from JSON
+let songs00s = [];
+fetch("00s_songs.json")
+    .then(response => response.json())
+    .then(data => {
+        songs00s = data;
+        populatePlaylist();
+    })
+    .catch(err => console.error("Error loading songs:", err));
 
 // Populate playlist
 function populatePlaylist() {
@@ -162,7 +149,6 @@ function populatePlaylist() {
         playlistEl.appendChild(li);
     });
 }
-populatePlaylist();
 
 // Play a song by index
 function playSong(index) {
@@ -174,7 +160,7 @@ function playSong(index) {
 
 // Play random song
 document.getElementById("play-random").addEventListener("click", () => {
-    if(songs00s.length === 0) return;
+    if (songs00s.length === 0) return;
     const randomIndex = Math.floor(Math.random() * songs00s.length);
     playSong(randomIndex);
 });
