@@ -99,7 +99,7 @@
     }
 
     .bingo-section {
-      width: 350px;
+      width: 600px; /* wider container to fit full grid */
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -135,7 +135,7 @@
       border-radius: 12px;
       padding: 10px;
       width: 100%;
-      min-height: 500px; /* bigger container */
+      min-height: 600px; /* large enough to show 5x5 grid */
       max-height: 800px;
       overflow-y: auto;
       border: 2px solid #00ffff;
@@ -145,7 +145,7 @@
     }
 
     .bingo-placeholder div {
-      padding: 10px;
+      padding: 15px;
       background-color: #333;
       border-radius: 6px;
       text-align: center;
@@ -235,7 +235,7 @@
       fetch(`${category}_songs.json`)
         .then(response => response.json())
         .then(songs => {
-          songs = shuffleArray(songs); // shuffle playlist
+          songs = shuffleArray(songs);
 
           playlistContainer.innerHTML = '';
           songs.forEach(song => {
@@ -272,7 +272,6 @@
         });
     }
 
-    // Initial load
     loadPlaylist(categoryDropdown.value);
 
     categoryDropdown.addEventListener('change', () => {
@@ -297,7 +296,6 @@
             return;
           }
 
-          // render card as 5x5 grid
           let html = '';
           card.forEach(row => {
             row.forEach(title => {
