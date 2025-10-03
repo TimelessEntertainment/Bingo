@@ -257,3 +257,53 @@ document.getElementById('checkCard').addEventListener('click', () => {
 </script>
 </body>
 </html>
+<h2>00s Playlist</h2>
+<div id="playlist"></div>
+<button id="play-random">Play Random Song</button>
+<audio id="audio-player" controls></audio>
+let songs00s = [];
+
+// Load the JSON
+fetch("00s_songs.json")
+  .then(response => response.json())
+  .then(data => {
+    songs00s = data;
+    populatePlaylist();
+  })
+  .catch(err => console.error("Error loading songs:", err));
+
+// Populate the playlist in the HTML
+function populatePlaylist() {
+  const playlistDiv = document.getElementById("playlist");
+  playlistDiv.innerHTML = ""; // clear if already populated
+
+  songs00s.forEach((song, index) => {
+    const songItem = document.createElement("div");
+    songItem.textContent = `${song.title} - ${song.artist}`;
+    songItem.dataset.index = index; // store index for click events
+    songItem.style.cursor = "pointer";
+    
+    // Optional: click to play that song
+    songItem.addEventListener("click", () => {
+      playSong(index);
+    });
+
+    playlistDiv.appendChild(songItem);
+  });
+}
+
+// Play a specific song by index
+function playSong(index) {
+  const song = songs00s[index];
+  const audioPlayer = document.getElementById("audio-player");
+  audioPlayer.src = song.file;
+  audioPlayer.play();
+  console.log("Playing:", song.title, "-", song.artist);
+}
+
+// Play a random song
+document.getElementById("play-random").addEventListener("click", () => {
+  const randomIndex = Math.floor(Math.random() * songs00s.length);
+  playSong(randomIndex);
+});
+
