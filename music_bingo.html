@@ -3,195 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Music Bingo</title>
-<link href="style.css" rel="stylesheet">
+<title>00s Music Bingo</title>
 <style>
-    body {
-        background-color: #1a1a1a;
-        color: #fff;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-    }
-    header {
-        background-color: #222;
-        padding: 15px 30px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    header h1 {
-        color: #ff3366;
-        margin: 0;
-        font-size: 28px;
-    }
-    header .datetime {
-        color: #ff3366;
-        font-size: 18px;
-    }
-    header a.logout {
-        color: #ff3366;
-        text-decoration: none;
-        font-size: 18px;
-    }
-    .container {
-        display: flex;
-        justify-content: center;
-        padding: 20px;
-        gap: 20px;
-    }
-    .playlist-container {
-        flex: 2;
-        background-color: #2a2a2a;
-        padding: 20px;
-        border-radius: 15px;
-    }
-    .playlist-container h2 {
-        color: #ff3366;
-        margin-bottom: 10px;
-    }
-    select {
-        font-size: 16px;
-        padding: 6px;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        border: none;
-    }
-    ul.playlist {
-        list-style: none;
-        padding: 0;
-        max-height: 300px;
-        overflow-y: scroll;
-        border: 1px solid #444;
-        border-radius: 8px;
-    }
-    ul.playlist li {
-        padding: 6px 10px;
-        border-bottom: 1px solid #444;
-        cursor: pointer;
-    }
-    ul.playlist li:hover {
-        background-color: #ff3366;
-        color: #000;
-    }
-    .card-checker {
-        flex: 1;
-        background-color: #2a2a2a;
-        padding: 20px;
-        border-radius: 15px;
-    }
-    .card-checker h2 {
-        color: #ff3366;
-    }
-    .card-checker input[type="text"] {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        margin-top: 10px;
-        border-radius: 8px;
-        border: none;
-    }
-    .card-display {
-        margin-top: 20px;
-        background-color: #111;
-        padding: 10px;
-        border-radius: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-    }
-    audio {
-        width: 100%;
-        margin-bottom: 10px;
-        outline: none;
-    }
+  body { font-family: Arial, sans-serif; background-color: #111; color: #fff; margin: 0; padding: 0; }
+  header { text-align: center; padding: 20px; background-color: #222; }
+  h1 { margin: 0; font-size: 2rem; }
+  #nowPlaying { text-align: center; padding: 10px; background-color: #333; font-weight: bold; font-size: 1.2rem; }
+  #playlistContainer { max-width: 600px; margin: 20px auto; background-color: #222; border-radius: 8px; overflow-y: auto; max-height: 400px; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { padding: 10px 15px; border-bottom: 1px solid #444; cursor: pointer; }
+  li:hover { background-color: #333; }
+  .playing { background-color: #555; font-weight: bold; }
+  audio { display: block; margin: 20px auto; width: 90%; max-width: 600px; }
 </style>
 </head>
 <body>
+
 <header>
-    <h1>Welcome Mike!</h1>
-    <div class="datetime" id="datetime"></div>
-    <a href="login.html" class="logout">Logout</a>
+  <h1>00s Music Bingo</h1>
 </header>
 
-<div class="container">
-    <div class="playlist-container">
-        <h2>Select Set:</h2>
-        <select id="setSelect">
-            <option value="00s">00's Hits</option>
-            <!-- Add more sets here if you make more JSON files -->
-        </select>
+<div id="nowPlaying">Now Playing: None</div>
 
-        <audio id="audioPlayer" controls></audio>
-        <ul class="playlist" id="playlist"></ul>
-    </div>
-
-    <div class="card-checker">
-        <h2>Card Checker</h2>
-        <p>Enter card number to check:</p>
-        <input type="text" id="cardNumber" placeholder="Card #">
-        <button id="checkCard" style="margin-top: 10px; padding: 12px; font-size: 16px; background-color: #ff3366; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Check</button>
-
-        <div class="card-display" id="cardDisplay">
-            <p>No card selected.</p>
-        </div>
-    </div>
+<div id="playlistContainer">
+  <ul id="playlist"></ul>
 </div>
 
+<audio id="audio" controls></audio>
+
 <script>
-// GitHub raw URL base
-const repoBase = "https://raw.githubusercontent.com/mikewallace/TimelessEntertainment/main/";
+const playlistEl = document.getElementById('playlist');
+const audioEl = document.getElementById('audio');
+const nowPlayingEl = document.getElementById('nowPlaying');
 
-// Elements
-const setSelect = document.getElementById("setSelect");
-const playlistEl = document.getElementById("playlist");
-const audioPlayer = document.getElementById("audioPlayer");
-const datetimeEl = document.getElementById("datetime");
-const cardDisplay = document.getElementById("cardDisplay");
+let songs = [];
+let currentIndex = -1;
 
-let currentSongs = [];
+// Raw GitHub JSON URL
+const jsonURL = 'https://raw.githubusercontent.com/TimelessEntertainment/TimelessEntertainment/main/00s_songs.json';
 
-// Load playlist JSON
-function loadPlaylist(set) {
-    playlistEl.innerHTML = "Loading playlist...";
-    fetch(repoBase + set + "_songs.json")
-        .then(res => res.json())
-        .then(data => {
-            currentSongs = data;
-            playlistEl.innerHTML = "";
-            data.forEach((song, idx) => {
-                const li = document.createElement("li");
-                li.textContent = `${song.title} - ${song.artist}`;
-                li.onclick = () => {
-                    // Encode spaces for GitHub raw URL
-                    audioPlayer.src = repoBase + song.file.replace(/ /g, "%20");
-                    audioPlayer.play();
-                };
-                playlistEl.appendChild(li);
-            });
-        })
-        .catch(err => {
-            console.error("Error loading playlist:", err);
-            playlistEl.innerHTML = "Failed to load playlist.";
-        });
+// Fetch playlist
+fetch(jsonURL)
+  .then(response => {
+    if (!response.ok) throw new Error('Failed to load playlist');
+    return response.json();
+  })
+  .then(data => {
+    songs = shuffleArray(data); // Shuffle songs on load
+    renderPlaylist();
+    playNextSong(); // Start with the first song
+  })
+  .catch(err => {
+    playlistEl.innerHTML = `<li style="color:red;">Error loading playlist: ${err.message}</li>`;
+  });
+
+// Render playlist
+function renderPlaylist() {
+  playlistEl.innerHTML = '';
+  songs.forEach((song, index) => {
+    const li = document.createElement('li');
+    li.textContent = `${song.title} - ${song.artist}`;
+    li.dataset.index = index;
+    li.addEventListener('click', () => playSong(parseInt(li.dataset.index)));
+    playlistEl.appendChild(li);
+  });
 }
 
-// Initial load
-loadPlaylist(setSelect.value);
-setSelect.addEventListener("change", () => loadPlaylist(setSelect.value));
-
-// Datetime
-function updateDatetime() {
-    const now = new Date();
-    datetimeEl.textContent = now.toLocaleString();
+// Shuffle helper
+function shuffleArray(array) {
+  let arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
-setInterval(updateDatetime, 1000);
-updateDatetime();
 
-// Card checker (mock)
-document.getElementById('checkCard').addEventListener("click", () => {
-    const cardNum = document.getElementById("cardNumber").value;
-    cardDisplay.innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
-});
+// Play a song by index
+function playSong(index) {
+  if (index < 0 || index >= songs.length) return;
+  currentIndex = index;
+  const song = songs[index];
+  audioEl.src = song.file;
+  audioEl.play();
+  nowPlayingEl.textContent = `Now Playing: ${song.title} - ${song.artist}`;
+  highlightPlaying();
+}
+
+// Play next song in shuffled order
+function playNextSong() {
+  currentIndex++;
+  if (currentIndex >= songs.length) currentIndex = 0;
+  playSong(currentIndex);
+}
+
+// Highlight currently playing
+function highlightPlaying() {
+  const allItems = playlistEl.querySelectorAll('li');
+  allItems.forEach((item, i) => {
+    item.classList.toggle('playing', i === currentIndex);
+  });
+}
+
+// Auto-play next when current ends
+audioEl.addEventListener('ended', playNextSong);
 </script>
+
 </body>
 </html>
