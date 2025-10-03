@@ -3,111 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>00s Music Bingo</title>
+<title>Music Bingo</title>
 <style>
-  body { font-family: Arial, sans-serif; background-color: #111; color: #fff; margin: 0; padding: 0; }
-  header { text-align: center; padding: 20px; background-color: #222; }
-  h1 { margin: 0; font-size: 2rem; }
-  #nowPlaying { text-align: center; padding: 10px; background-color: #333; font-weight: bold; font-size: 1.2rem; }
-  #playlistContainer { max-width: 600px; margin: 20px auto; background-color: #222; border-radius: 8px; overflow-y: auto; max-height: 400px; }
-  ul { list-style: none; padding: 0; margin: 0; }
-  li { padding: 10px 15px; border-bottom: 1px solid #444; cursor: pointer; }
-  li:hover { background-color: #333; }
-  .playing { background-color: #555; font-weight: bold; }
-  audio { display: block; margin: 20px auto; width: 90%; max-width: 600px; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #111 url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+  }
+  h1 { text-align: center; margin-top: 20px; }
+  #playlist {
+    margin: 20px auto;
+    max-width: 600px;
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    border-radius: 10px;
+  }
+  #playlist li {
+    list-style: none;
+    padding: 5px;
+    cursor: pointer;
+  }
+  #playlist li:hover {
+    background: rgba(255,255,255,0.2);
+  }
+  #playlist li.playing {
+    background: rgba(0,255,0,0.4);
+  }
+  audio {
+    display: block;
+    margin: 20px auto;
+    width: 80%;
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>00s Music Bingo</h1>
-</header>
+<h1>Music Bingo - 00s Playlist</h1>
 
-<div id="nowPlaying">Now Playing: None</div>
-
-<div id="playlistContainer">
-  <ul id="playlist"></ul>
-</div>
+<ul id="playlist"></ul>
 
 <audio id="audio" controls></audio>
 
 <script>
-const playlistEl = document.getElementById('playlist');
-const audioEl = document.getElementById('audio');
-const nowPlayingEl = document.getElementById('nowPlaying');
+  // ========================
+  // Songs JSON (inlined)
+  // ========================
+  const songs = [
+    {"title":"1234","artist":"Feist_","file":"00s/1234 - Feist_.mp3"},
+    {"title":"A Thousand Miles","artist":"Vanessa Carlton_","file":"00s/A Thousand Miles - Vanessa Carlton_.mp3"},
+    {"title":"Beautiful Girls","artist":"Sean Kingston_","file":"00s/Beautiful Girls - Sean Kingston_.mp3"},
+    {"title":"Best of You","artist":"Foo Fighters_","file":"00s/Best of You - Foo Fighters_.mp3"},
+    {"title":"Better Together","artist":"Jack Johnson_","file":"00s/Better Together - Jack Johnson_.mp3"}
+    // ... include all other songs here
+  ];
 
-let songs = [];
-let currentIndex = -1;
+  const playlistEl = document.getElementById('playlist');
+  const audioEl = document.getElementById('audio');
 
-// Raw GitHub JSON URL
-const jsonURL = 'https://raw.githubusercontent.com/TimelessEntertainment/TimelessEntertainment/main/00s_songs.json';
-
-// Fetch playlist
-fetch(jsonURL)
-  .then(response => {
-    if (!response.ok) throw new Error('Failed to load playlist');
-    return response.json();
-  })
-  .then(data => {
-    songs = shuffleArray(data); // Shuffle songs on load
-    renderPlaylist();
-    playNextSong(); // Start with the first song
-  })
-  .catch(err => {
-    playlistEl.innerHTML = `<li style="color:red;">Error loading playlist: ${err.message}</li>`;
-  });
-
-// Render playlist
-function renderPlaylist() {
-  playlistEl.innerHTML = '';
+  // Render playlist
   songs.forEach((song, index) => {
     const li = document.createElement('li');
     li.textContent = `${song.title} - ${song.artist}`;
     li.dataset.index = index;
-    li.addEventListener('click', () => playSong(parseInt(li.dataset.index)));
+    li.addEventListener('click', () => {
+      playSong(index);
+    });
     playlistEl.appendChild(li);
   });
-}
 
-// Shuffle helper
-function shuffleArray(array) {
-  let arr = array.slice();
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+  let currentIndex = -1;
+
+  function playSong(index) {
+    const prev = playlistEl.querySelector('.playing');
+    if (prev) prev.classList.remove('playing');
+
+    const li = playlistEl.querySelector(`li[data-index='${index}']`);
+    li.classList.add('playing');
+
+    currentIndex = index;
+    audioEl.src = songs[index].file;
+    audioEl.play();
   }
-  return arr;
-}
 
-// Play a song by index
-function playSong(index) {
-  if (index < 0 || index >= songs.length) return;
-  currentIndex = index;
-  const song = songs[index];
-  audioEl.src = song.file;
-  audioEl.play();
-  nowPlayingEl.textContent = `Now Playing: ${song.title} - ${song.artist}`;
-  highlightPlaying();
-}
-
-// Play next song in shuffled order
-function playNextSong() {
-  currentIndex++;
-  if (currentIndex >= songs.length) currentIndex = 0;
-  playSong(currentIndex);
-}
-
-// Highlight currently playing
-function highlightPlaying() {
-  const allItems = playlistEl.querySelectorAll('li');
-  allItems.forEach((item, i) => {
-    item.classList.toggle('playing', i === currentIndex);
+  // Auto play next song when current ends
+  audioEl.addEventListener('ended', () => {
+    let nextIndex = (currentIndex + 1) % songs.length;
+    playSong(nextIndex);
   });
-}
 
-// Auto-play next when current ends
-audioEl.addEventListener('ended', playNextSong);
 </script>
-
 </body>
 </html>
