@@ -149,6 +149,19 @@
       margin: 2px 0;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    td {
+      border: 1px solid #ff0099;
+      text-align: center;
+      padding: 5px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+
     /* Scrollbar style */
     .playlist-container::-webkit-scrollbar,
     .bingo-placeholder::-webkit-scrollbar {
@@ -170,7 +183,6 @@
       Music Bingo - <span id="categoryTitle">00s</span>
       <select id="categoryDropdown">
         <option value="00s">00s</option>
-        <!-- future categories can be added here -->
       </select>
     </h1>
   </header>
@@ -198,14 +210,18 @@
     const bingoPlaceholder = document.querySelector('.bingo-placeholder');
 
     let playedSongs = [];
+    let bingoCards = {};
 
-    // Example bingo cards
-    const bingoCards = {
-      "1": ["1234", "A Thousand Miles", "Bleeding Love", "Fix You", "Hey There Delilah"],
-      "2": ["Bulletproof", "Bye Bye Bye", "Chasing Cars", "Crazy", "Cupid's Chokehold"]
-      // add more cards here
-    };
+    // Load generated cards JSON
+    fetch('00s_cards.json')
+      .then(res => res.json())
+      .then(data => {
+        bingoCards = data;
+        console.log('Bingo cards loaded:', Object.keys(bingoCards).length);
+      })
+      .catch(err => console.error('Failed to load bingo cards:', err));
 
+    // Load playlist
     function loadPlaylist(category) {
       categoryTitle.textContent = category;
       fetch(`${category}_songs.json`)
@@ -249,16 +265,15 @@
         });
     }
 
-    // Initial load
     loadPlaylist(categoryDropdown.value);
 
-    // Handle category change
+    // Category change
     categoryDropdown.addEventListener('change', () => {
       playedSongs = [];
       loadPlaylist(categoryDropdown.value);
     });
 
-    // Check Card functionality
+    // Check card
     checkCardButton.addEventListener('click', () => {
       const cardNumber = cardNumberInput.value.trim();
       if(cardNumber === '') {
@@ -273,12 +288,23 @@
         return;
       }
 
-      const html = card.map(title => {
-        const playedClass = playedSongs.includes(title) ? 'played' : '';
-        return `<div class="${playedClass}">${title}</div>`;
-      }).join('');
+      const table = document.createElement('table');
 
-      bingoPlaceholder.innerHTML = html;
+      card.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+          const td = document.createElement('td');
+          td.textContent = cell;
+          td.style.backgroundColor = (cell === 'FREE') ? 'lightgreen' :
+                                     (playedSongs.includes(cell)) ? '#ff0099' : '#1e1e1e';
+          td.style.color = (cell === 'FREE' || playedSongs.includes(cell)) ? '#121212' : '#f0f0f0';
+          tr.appendChild(td);
+        });
+        table.appendChild(tr);
+      });
+
+      bingoPlaceholder.innerHTML = '';
+      bingoPlaceholder.appendChild(table);
     });
   </script>
 
