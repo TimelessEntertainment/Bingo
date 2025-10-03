@@ -6,157 +6,113 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
+            background: url('../background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
             color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
-        header {
-            width: 90%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
+        .container {
+            text-align: center;
+            padding: 50px 20px;
         }
 
-        #welcome-text {
-            font-size: 2em;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #ff0000;
+            text-shadow: 2px 2px 8px #000;
         }
 
-        #dynamic-info {
-            text-align: right;
-            font-size: 0.9em;
-        }
-
-        .logout-link {
-            text-decoration: underline;
-            color: #ff4c4c;
-            cursor: pointer;
-            font-size: 0.9em;
+        .datetime {
+            margin-bottom: 30px;
+            font-size: 20px;
         }
 
         .games-container {
-            display: grid;
-            grid-template-columns: repeat(3, 200px);
+            display: flex;
+            justify-content: center;
             gap: 20px;
-            margin-top: 50px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
         }
 
         .game-btn {
-            padding: 20px;
-            font-size: 1.2em;
+            background: linear-gradient(45deg, #00ffcc, #00ccff);
             border: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
             border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            color: white;
+            box-shadow: 2px 2px 15px rgba(0,0,0,0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .game-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            transform: scale(1.1);
+            box-shadow: 2px 2px 25px rgba(0,0,0,0.7);
         }
 
-        .music-bingo { background-color: #ff7f50; }
-        .bdsm-trivia { background-color: #6a5acd; }
-        .bingo { background-color: #20b2aa; }
-
-        .extra-space {
-            margin-top: 50px; /* for future images/cards */
+        .logout-link {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #00ffcc;
+            text-decoration: underline;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div id="welcome-text">Welcome!</div>
-        <div>
-            <span id="dynamic-info">Loading date/time...</span> |
-            <span class="logout-link" id="logout-link">Logout</span>
+    <div class="container">
+        <h1>Welcome Michael!</h1>
+        <div class="datetime" id="datetime"></div>
+
+        <div class="games-container">
+            <a href="music_bingo.html" class="game-btn">Music Bingo</a>
+            <a href="../BDSM Trivia/index2.html" class="game-btn">BDSM Trivia</a>
+            <a href="../Bingo/bingo.html" class="game-btn">Bingo</a>
         </div>
-    </header>
 
-    <div class="games-container">
-        <button class="game-btn music-bingo" onclick="location.href='music_bingo.html'">Music Bingo</button>
-        <button class="game-btn bdsm-trivia" onclick="location.href='bdsm_trivia.html'">BDSM Trivia</button>
-        <button class="game-btn bingo" onclick="alert('Coming Soon!')">Bingo</button>
-    </div>
-
-    <div class="extra-space">
-        <!-- Future images/cards can go here -->
+        <a class="logout-link" id="logout-link">Logout</a>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('datetime').innerHTML = now.toLocaleDateString(undefined, options) + ' | ' + timeString;
+        }
+        setInterval(updateDateTime, 1000);
+        updateDateTime();
 
-        // Firebase config
+        // Firebase Logout
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+
         const firebaseConfig = {
-            apiKey: "AIzaSyCizkQLkKhxlQSRZ7J378jLDVlqPdadu78",
-            authDomain: "music-bingo-login.firebaseapp.com",
-            projectId: "music-bingo-login",
-            storageBucket: "music-bingo-login.firebasestorage.app",
-            messagingSenderId: "814220049067",
-            appId: "1:814220049067:web:b7a771786e67e9bfa055ee"
+          apiKey: "AIzaSyCizkQLkKhxlQSRZ7J378jLDVlqPdadu78",
+          authDomain: "music-bingo-login.firebaseapp.com",
+          projectId: "music-bingo-login",
+          storageBucket: "music-bingo-login.firebasestorage.app",
+          messagingSenderId: "814220049067",
+          appId: "1:814220049067:web:b7a771786e67e9bfa055ee"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const welcomeText = document.getElementById("welcome-text");
-        const logoutLink = document.getElementById("logout-link");
-        const dynamicInfo = document.getElementById("dynamic-info");
-
-        // Firebase auth check
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                welcomeText.textContent = `Welcome, ${user.email}!`;
-            } else {
-                window.location.href = "login.html";
-            }
-        });
-
-        // Logout
-        logoutLink.addEventListener("click", () => {
+        document.getElementById('logout-link').addEventListener('click', () => {
             signOut(auth).then(() => {
                 window.location.href = "login.html";
             });
         });
-
-        // Date & time update
-        function updateDateTime() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateStr = now.toLocaleDateString(undefined, options);
-            const timeStr = now.toLocaleTimeString();
-            dynamicInfo.textContent = `${dateStr} | ${timeStr} | Weather: Loading...`;
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-
-        // Optional: Weather API (OpenWeatherMap)
-        async function updateWeather() {
-            const apiKey = "YOUR_OPENWEATHERMAP_API_KEY"; // replace with your API key
-            const city = "St. Louis"; // change as needed
-            try {
-                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`);
-                const data = await res.json();
-                const weatherDesc = data.weather[0].description;
-                const temp = Math.round(data.main.temp);
-                dynamicInfo.textContent = `${dynamicInfo.textContent.split('|')[0]} | ${dynamicInfo.textContent.split('|')[1]} | ${weatherDesc}, ${temp}°F`;
-            } catch (err) {
-                console.error("Weather API error:", err);
-            }
-        }
-
-        // Call weather update once (or periodically)
-        // updateWeather(); // uncomment when you add your OpenWeatherMap API key
     </script>
 </body>
 </html>
