@@ -6,60 +6,104 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            background: #1a1a1a;
-            color: #fff;
-            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #000);
+            color: white;
+            font-family: 'Arial', sans-serif;
             text-align: center;
-            margin: 0;
-            padding: 0;
+            padding: 50px;
         }
+
         h1 {
             font-size: 3em;
-            margin: 30px 0 10px 0;
-            color: #ff0000; /* Extreme Bar style */
-            text-shadow: 2px 2px #fff;
+            color: #ff1a1a;
+            margin-bottom: 50px;
+            text-shadow: 2px 2px 5px #000;
         }
+
         .games-container {
             display: flex;
             justify-content: center;
+            gap: 40px;
             flex-wrap: wrap;
-            gap: 30px;
-            margin-top: 50px;
+            margin-bottom: 50px;
         }
+
         .game-btn {
-            background: linear-gradient(45deg, #00ffcc, #0066ff);
-            color: #fff;
-            padding: 30px 50px;
-            font-size: 1.5em;
+            display: inline-block;
+            padding: 20px 40px;
+            font-size: 1.2em;
             font-weight: bold;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 12px;
             text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, #00f260, #0575e6);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+
         .game-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px #00ffcc;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
         }
+
         .logout-link {
+            color: #ff4d4d;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1em;
             display: block;
-            margin-top: 50px;
-            color: #00ffcc;
-            font-size: 1.2em;
+            margin-top: 30px;
+        }
+
+        .logout-link:hover {
             text-decoration: underline;
-            cursor: pointer;
+        }
+
+        /* Optional: space for images under buttons */
+        .placeholder {
+            margin-top: 30px;
+            height: 150px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome, Michael!</h1>
+    <h1>Welcome Michael!</h1>
     <div class="games-container">
         <a class="game-btn" href="music_bingo.html">Music Bingo</a>
-        <a class="game-btn" href="BDSM Trivia/index.html">BDSM Trivia</a>
-        <a class="game-btn" href="Bingo/bingo.html">Bingo</a>
+        <a class="game-btn" href="bdsm_trivia.html">BDSM Trivia</a>
+        <a class="game-btn" href="bingo.html">Bingo</a>
     </div>
-    <span class="logout-link" onclick="logout()">Logout</span>
 
-    <script type="module" src="script.js"></script>
+    <div class="placeholder">
+        <!-- Space for images or other content -->
+    </div>
+
+    <a href="#" class="logout-link" id="logout-link">Logout</a>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCizkQLkKhxlQSRZ7J378jLDVlqPdadu78",
+          authDomain: "music-bingo-login.firebaseapp.com",
+          projectId: "music-bingo-login",
+          storageBucket: "music-bingo-login.firebasestorage.app",
+          messagingSenderId: "814220049067",
+          appId: "1:814220049067:web:b7a771786e67e9bfa055ee"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const logoutLink = document.getElementById("logout-link");
+        logoutLink.addEventListener("click", () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            }).catch((error) => {
+                alert(error.message);
+            });
+        });
+    </script>
 </body>
 </html>
