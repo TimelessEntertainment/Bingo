@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Music Bingo - 00s</title>
-  
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Fredoka+One&display=swap" rel="stylesheet">
 
   <style>
-    /* --- General Layout --- */
     body {
       margin: 0;
       padding: 0;
@@ -53,9 +52,9 @@
 
     main {
       display: flex;
-      justify-content: flex-start; /* shift everything left */
+      justify-content: flex-start;
       padding: 20px;
-      gap: 20px;
+      gap: 40px;
     }
 
     .player-section {
@@ -100,22 +99,20 @@
     }
 
     .bingo-section {
-      width: 200px;
+      width: 250px;
       display: flex;
       flex-direction: column;
       gap: 10px;
       align-items: center;
     }
 
-    #cardNumber {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 2px solid #ff0099;
-      background-color: #1e1e1e;
-      color: #fff;
+    .bingo-section input {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      width: 80%;
+      text-align: center;
       font-size: 1rem;
-      box-sizing: border-box;
     }
 
     .check-button {
@@ -127,7 +124,6 @@
       border-radius: 8px;
       cursor: pointer;
       transition: 0.2s;
-      width: 100%;
     }
 
     .check-button:hover {
@@ -135,29 +131,32 @@
     }
 
     .bingo-placeholder {
-      width: 100%;
       background-color: #1e1e1e;
-      border: 2px solid #00ffff;
       border-radius: 12px;
       padding: 10px;
-      text-align: center;
-      min-height: 150px;
-      color: #fff;
+      width: 100%;
+      min-height: 250px;
+      overflow-y: auto;
+      border: 2px solid #00ffff;
     }
 
-    h2 {
-      font-family: 'Fredoka One', cursive;
-      text-align: center;
-      margin-bottom: 10px;
-      color: #00ffff;
+    .played {
+      background-color: #ff0099;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin: 2px 0;
     }
 
     /* Scrollbar style */
-    .playlist-container::-webkit-scrollbar {
+    .playlist-container::-webkit-scrollbar,
+    .bingo-placeholder::-webkit-scrollbar {
       width: 8px;
     }
 
-    .playlist-container::-webkit-scrollbar-thumb {
+    .playlist-container::-webkit-scrollbar-thumb,
+    .bingo-placeholder::-webkit-scrollbar-thumb {
       background-color: #ff0099;
       border-radius: 4px;
     }
@@ -168,7 +167,7 @@
   <header>
     <div class="welcome">Welcome Mike</div>
     <h1>
-      Music Bingo - 00s
+      Music Bingo - <span id="categoryTitle">00s</span>
       <select id="categoryDropdown">
         <option value="00s">00s</option>
         <!-- future categories can be added here -->
@@ -183,35 +182,53 @@
     </div>
 
     <div class="bingo-section">
-      <input type="text" id="cardNumber" placeholder="Enter Card Number">
+      <input type="text" id="cardNumberInput" placeholder="Enter card #">
       <button class="check-button" id="checkCardButton">Check Card</button>
-      <div class="bingo-placeholder">Bingo Card Here</div>
+      <div class="bingo-placeholder"></div>
     </div>
   </main>
 
   <script>
     const categoryDropdown = document.getElementById('categoryDropdown');
+    const categoryTitle = document.getElementById('categoryTitle');
     const audioPlayer = document.getElementById('audioPlayer');
     const playlistContainer = document.getElementById('playlist');
+    const cardNumberInput = document.getElementById('cardNumberInput');
     const checkCardButton = document.getElementById('checkCardButton');
-    const cardNumberInput = document.getElementById('cardNumber');
+    const bingoPlaceholder = document.querySelector('.bingo-placeholder');
+
+    let playedSongs = [];
+
+    // Example bingo cards
+    const bingoCards = {
+      "1": ["1234", "A Thousand Miles", "Bleeding Love", "Fix You", "Hey There Delilah"],
+      "2": ["Bulletproof", "Bye Bye Bye", "Chasing Cars", "Crazy", "Cupid's Chokehold"]
+      // add more cards here
+    };
 
     function loadPlaylist(category) {
+      categoryTitle.textContent = category;
       fetch(`${category}_songs.json`)
         .then(response => response.json())
         .then(songs => {
-          playlistContainer.innerHTML = ''; // clear previous
+          playlistContainer.innerHTML = '';
           songs.forEach((song, index) => {
             const item = document.createElement('div');
             item.classList.add('playlist-item');
             item.textContent = `${song.title} - ${song.artist}`;
             item.dataset.file = song.file;
+            item.dataset.title = song.title;
 
             item.addEventListener('click', () => {
               audioPlayer.src = song.file;
               audioPlayer.play();
               document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
               item.classList.add('active');
+
+              // Track played songs
+              if(!playedSongs.includes(song.title)) {
+                playedSongs.push(song.title);
+              }
             });
 
             playlistContainer.appendChild(item);
@@ -221,6 +238,9 @@
           if(songs.length > 0) {
             audioPlayer.src = songs[0].file;
             playlistContainer.firstChild.classList.add('active');
+            if(!playedSongs.includes(songs[0].title)) {
+              playedSongs.push(songs[0].title);
+            }
           }
         })
         .catch(err => {
@@ -234,18 +254,31 @@
 
     // Handle category change
     categoryDropdown.addEventListener('change', () => {
+      playedSongs = [];
       loadPlaylist(categoryDropdown.value);
     });
 
-    // Handle Check Card
+    // Check Card functionality
     checkCardButton.addEventListener('click', () => {
       const cardNumber = cardNumberInput.value.trim();
       if(cardNumber === '') {
         alert('Please enter a card number');
         return;
       }
-      document.querySelector('.bingo-placeholder').textContent = `Showing Bingo Card #${cardNumber}`;
-      // TODO: eventually display actual card and highlight played songs
+
+      const card = bingoCards[cardNumber];
+      if(!card) {
+        alert('Card not found!');
+        bingoPlaceholder.innerHTML = '';
+        return;
+      }
+
+      const html = card.map(title => {
+        const playedClass = playedSongs.includes(title) ? 'played' : '';
+        return `<div class="${playedClass}">${title}</div>`;
+      }).join('');
+
+      bingoPlaceholder.innerHTML = html;
     });
   </script>
 
