@@ -99,7 +99,7 @@
     }
 
     .bingo-section {
-      width: 550px; /* bigger container */
+      width: 350px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -133,32 +133,28 @@
     .bingo-placeholder {
       background-color: #1e1e1e;
       border-radius: 12px;
-      padding: 15px;
+      padding: 10px;
       width: 100%;
-      max-width: 100%;
+      min-height: 500px; /* bigger container */
+      max-height: 800px;
+      overflow-y: auto;
+      border: 2px solid #00ffff;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      grid-auto-rows: 70px;
       gap: 5px;
-      border: 2px solid #00ffff;
-      overflow-y: auto;
     }
 
     .bingo-placeholder div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 5px;
-      background-color: #2a2a2a;
+      padding: 10px;
+      background-color: #333;
       border-radius: 6px;
+      text-align: center;
       font-size: 0.9rem;
-      transition: 0.2s;
     }
 
     .played {
       background-color: #ff0099 !important;
-      color: #fff !important;
+      color: #fff;
       font-weight: bold;
     }
 
@@ -183,7 +179,6 @@
       Music Bingo - <span id="categoryTitle">00s</span>
       <select id="categoryDropdown">
         <option value="00s">00s</option>
-        <!-- future categories can be added here -->
       </select>
     </h1>
   </header>
@@ -211,24 +206,37 @@
     const bingoPlaceholder = document.querySelector('.bingo-placeholder');
 
     let playedSongs = [];
-    let bingoCards = {};
 
-    // Load bingo cards JSON
-    fetch('00s_cards.json')
-      .then(res => res.json())
-      .then(data => {
-        bingoCards = data;
-      })
-      .catch(err => {
-        console.error('Failed to load bingo cards:', err);
+    function shuffleArray(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
+
+    function highlightPlayedSongs() {
+      const bingoSquares = bingoPlaceholder.querySelectorAll('div');
+      bingoSquares.forEach(square => {
+        if(playedSongs.includes(square.textContent)) {
+          square.classList.add('played');
+        } else {
+          square.classList.remove('played');
+        }
       });
 
-    // Load playlist
+      document.querySelectorAll('.playlist-item').forEach(item => {
+        if(playedSongs.includes(item.dataset.title)) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
     function loadPlaylist(category) {
       categoryTitle.textContent = category;
       fetch(`${category}_songs.json`)
         .then(response => response.json())
         .then(songs => {
+          songs = shuffleArray(songs); // shuffle playlist
+
           playlistContainer.innerHTML = '';
           songs.forEach(song => {
             const item = document.createElement('div');
@@ -240,25 +248,22 @@
             item.addEventListener('click', () => {
               audioPlayer.src = song.file;
               audioPlayer.play();
-              document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
-              item.classList.add('active');
 
-              if (!playedSongs.includes(song.title)) {
+              if(!playedSongs.includes(song.title)) {
                 playedSongs.push(song.title);
-                highlightPlayedSongs();
               }
+              highlightPlayedSongs();
             });
 
             playlistContainer.appendChild(item);
           });
 
-          if (songs.length > 0) {
+          if(songs.length > 0) {
             audioPlayer.src = songs[0].file;
-            playlistContainer.firstChild.classList.add('active');
             if(!playedSongs.includes(songs[0].title)) {
               playedSongs.push(songs[0].title);
-              highlightPlayedSongs();
             }
+            highlightPlayedSongs();
           }
         })
         .catch(err => {
@@ -267,50 +272,47 @@
         });
     }
 
+    // Initial load
     loadPlaylist(categoryDropdown.value);
 
     categoryDropdown.addEventListener('change', () => {
       playedSongs = [];
       loadPlaylist(categoryDropdown.value);
-      renderCard(); // re-render card on category change
     });
 
-    // Render bingo card
-    function renderCard() {
+    checkCardButton.addEventListener('click', () => {
       const cardNumber = cardNumberInput.value.trim();
-      if(cardNumber === '') return;
-
-      const card = bingoCards[cardNumber];
-      if(!card) {
-        bingoPlaceholder.innerHTML = '';
+      if(cardNumber === '') {
+        alert('Please enter a card number');
         return;
       }
 
-      let html = '';
-      card.forEach(row => {
-        row.forEach(cell => {
-          const playedClass = playedSongs.includes(cell) ? 'played' : '';
-          html += `<div class="${playedClass}">${cell}</div>`;
+      fetch('00s_cards.json')
+        .then(res => res.json())
+        .then(cards => {
+          const card = cards[cardNumber];
+          if(!card) {
+            alert('Card not found!');
+            bingoPlaceholder.innerHTML = '';
+            return;
+          }
+
+          // render card as 5x5 grid
+          let html = '';
+          card.forEach(row => {
+            row.forEach(title => {
+              const playedClass = playedSongs.includes(title) ? 'played' : '';
+              html += `<div class="${playedClass}">${title}</div>`;
+            });
+          });
+
+          bingoPlaceholder.innerHTML = html;
+          highlightPlayedSongs();
+        })
+        .catch(err => {
+          console.error('Error loading card:', err);
         });
-      });
-
-      bingoPlaceholder.innerHTML = html;
-    }
-
-    // Highlight already played songs
-    function highlightPlayedSongs() {
-      const squares = bingoPlaceholder.querySelectorAll('div');
-      squares.forEach(square => {
-        if(playedSongs.includes(square.textContent)) {
-          square.classList.add('played');
-        }
-      });
-    }
-
-    checkCardButton.addEventListener('click', () => {
-      renderCard();
     });
   </script>
-
 </body>
 </html>
