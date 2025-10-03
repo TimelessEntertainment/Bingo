@@ -17,35 +17,35 @@
         background: linear-gradient(90deg, #8b0000, #ff4500);
         padding: 20px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
+        gap: 40px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        flex-wrap: wrap;
     }
 
-    .top-bar h1 {
-        margin: 0;
+    .welcome {
         font-size: 2em;
+        font-weight: bold;
         color: #fff;
     }
 
-    .top-bar .info {
-        text-align: right;
-        font-size: 1em;
-        line-height: 1.2em;
+    .date-time {
+        font-size: 1.5em;
+        color: #fff;
     }
 
     .games-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 30px;
-        max-width: 1000px;
-        margin: 50px auto 0 auto;
-        justify-items: center;
+        display: flex;
+        justify-content: center;
+        gap: 50px;
+        margin-top: 50px;
+        flex-wrap: wrap;
     }
 
     .game-btn {
-        width: 200px;
-        height: 200px;
+        width: 220px;
+        height: 220px;
         font-size: 1.5em;
         font-weight: bold;
         border: none;
@@ -65,13 +65,12 @@
         box-shadow: 0 0 20px rgba(255,255,255,0.5);
     }
 
-    /* Bar colors for each game */
-    .music-bingo {
-        background: linear-gradient(135deg, #ff00ff, #ff69b4);
-    }
-
     .bdsm-trivia {
         background: linear-gradient(135deg, #1e90ff, #00bfff);
+    }
+
+    .music-bingo {
+        background: linear-gradient(135deg, #ff00ff, #ff69b4);
     }
 
     .bingo {
@@ -83,28 +82,26 @@
         text-decoration: underline;
         cursor: pointer;
         font-size: 1em;
+        display: block;
+        text-align: center;
+        margin-top: 50px;
     }
 </style>
 </head>
 <body>
 
 <div class="top-bar">
-    <h1>Welcome <span id="user-email"></span></h1>
-    <div class="info">
-        <div id="date-time"></div>
-        <div id="weather">Loading weather...</div>
-    </div>
+    <div class="welcome">Welcome <span id="user-email"></span></div>
+    <div class="date-time" id="date-time"></div>
 </div>
 
 <div class="games-container">
-    <a class="game-btn music-bingo" href="music_bingo.html">Music Bingo</a>
     <a class="game-btn bdsm-trivia" href="dirtytrivianight.html">BDSM Trivia</a>
-    <a class="game-btn bingo" href="bingo.html">Bingo</a>
+    <a class="game-btn music-bingo" href="music_bingo.html">Music Bingo</a>
+    <a class="game-btn bingo" href="bingo.html">Extreme Bar Bingo</a>
 </div>
 
-<div style="text-align:center; margin-top:50px;">
-    <span class="logout-link" id="logout-btn">Logout</span>
-</div>
+<span class="logout-link" id="logout-btn">Logout</span>
 
 <script type="module">
 import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
@@ -134,19 +131,6 @@ function updateDateTime() {
 }
 setInterval(updateDateTime, 1000);
 updateDateTime();
-
-// Dynamic weather (replace YOUR_API_KEY with OpenWeatherMap key)
-const weatherEl = document.getElementById('weather');
-async function updateWeather() {
-    try {
-        const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=StLouis,US&units=imperial&appid=YOUR_API_KEY');
-        const data = await response.json();
-        weatherEl.textContent = `${data.weather[0].main}, ${Math.round(data.main.temp)}°F`;
-    } catch(e) {
-        weatherEl.textContent = 'Weather unavailable';
-    }
-}
-updateWeather();
 </script>
 
 </body>
