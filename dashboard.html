@@ -1,108 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard - Music Bingo</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            background: linear-gradient(to right, #1a1a1a, #000000);
-            font-family: Arial, sans-serif;
-            color: white;
-            text-align: center;
-        }
-        h1 {
-            font-size: 3em;
-            color: #ff0000;
-            margin-top: 20px;
-            text-shadow: 2px 2px #000;
-        }
-        .games-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            margin-top: 50px;
-        }
-        .game-btn {
-            background: linear-gradient(to right, #00ff99, #00ccff);
-            border: none;
-            padding: 25px 50px;
-            font-size: 1.5em;
-            color: #fff;
-            border-radius: 15px;
-            cursor: pointer;
-            text-decoration: none;
-            box-shadow: 0 0 15px #00ff99, 0 0 30px #00ccff inset;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .game-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 25px #00ff99, 0 0 40px #00ccff inset;
-        }
-        .logout-link {
-            display: inline-block;
-            margin-top: 40px;
-            font-size: 1em;
-            color: #00ccff;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .info {
-            margin-top: 20px;
-            font-size: 1.2em;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Dashboard - Game Hub</title>
+<link rel="stylesheet" href="style.css">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+        background: #0b0b0b;
+        color: white;
+    }
+
+    /* Top bar */
+    .top-bar {
+        background: linear-gradient(90deg, #8b0000, #ff4500);
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    }
+
+    .top-bar h1 {
+        margin: 0;
+        font-size: 2em;
+        color: #fff;
+    }
+
+    .top-bar .info {
+        text-align: right;
+        font-size: 1em;
+        line-height: 1.2em;
+    }
+
+    .games-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        max-width: 1000px;
+        margin: 50px auto 0 auto;
+        justify-items: center;
+    }
+
+    .game-btn {
+        width: 200px;
+        height: 200px;
+        font-size: 1.5em;
+        font-weight: bold;
+        border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        color: #fff;
+        text-decoration: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .game-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+
+    /* Bar colors for each game */
+    .music-bingo {
+        background: linear-gradient(135deg, #ff00ff, #ff69b4);
+    }
+
+    .bdsm-trivia {
+        background: linear-gradient(135deg, #1e90ff, #00bfff);
+    }
+
+    .bingo {
+        background: linear-gradient(135deg, #32cd32, #7fff00);
+    }
+
+    .logout-link {
+        color: #fff;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 1em;
+    }
+</style>
 </head>
 <body>
-    <h1>Welcome Michael!</h1>
 
+<div class="top-bar">
+    <h1>Welcome <span id="user-email"></span></h1>
     <div class="info">
-        <span id="date-time"></span> | <span id="weather">Loading weather...</span>
+        <div id="date-time"></div>
+        <div id="weather">Loading weather...</div>
     </div>
+</div>
 
-    <div class="games-container">
-        <a class="game-btn" href="music_bingo.html">Music Bingo</a>
-        <a class="game-btn" href="dirtytrivianight.html">BDSM Trivia</a>
-        <a class="game-btn" href="bingo.html">Bingo</a>
-    </div>
+<div class="games-container">
+    <a class="game-btn music-bingo" href="music_bingo.html">Music Bingo</a>
+    <a class="game-btn bdsm-trivia" href="dirtytrivianight.html">BDSM Trivia</a>
+    <a class="game-btn bingo" href="bingo.html">Bingo</a>
+</div>
 
-    <div>
-        <a class="logout-link" id="logout-btn">Logout</a>
-    </div>
+<div style="text-align:center; margin-top:50px;">
+    <span class="logout-link" id="logout-btn">Logout</span>
+</div>
 
-    <script type="module">
-        // Dynamic date/time
-        const dtEl = document.getElementById('date-time');
-        function updateDateTime() {
-            const now = new Date();
-            dtEl.textContent = now.toLocaleString();
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
+<script type="module">
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+const auth = getAuth();
 
-        // Dynamic weather (example using OpenWeatherMap, replace YOUR_API_KEY)
-        const weatherEl = document.getElementById('weather');
-        async function updateWeather() {
-            try {
-                const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=StLouis,US&units=imperial&appid=YOUR_API_KEY');
-                const data = await response.json();
-                weatherEl.textContent = `${data.weather[0].main}, ${Math.round(data.main.temp)}°F`;
-            } catch(e) {
-                weatherEl.textContent = 'Weather unavailable';
-            }
-        }
-        updateWeather();
+// Display signed-in user email
+const userEmailSpan = document.getElementById('user-email');
+const user = auth.currentUser;
+if (user) {
+    userEmailSpan.textContent = user.email;
+} else {
+    userEmailSpan.textContent = 'Guest';
+}
 
-        // Logout functionality
-        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        const auth = getAuth();
-        const logoutBtn = document.getElementById('logout-btn');
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
-            });
-        });
-    </script>
+// Logout
+document.getElementById('logout-btn').addEventListener('click', () => {
+    signOut(auth).then(() => {
+        window.location.href = 'login.html';
+    });
+});
+
+// Dynamic date/time
+const dtEl = document.getElementById('date-time');
+function updateDateTime() {
+    const now = new Date();
+    dtEl.textContent = now.toLocaleString();
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+// Dynamic weather (replace YOUR_API_KEY with OpenWeatherMap key)
+const weatherEl = document.getElementById('weather');
+async function updateWeather() {
+    try {
+        const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=StLouis,US&units=imperial&appid=YOUR_API_KEY');
+        const data = await response.json();
+        weatherEl.textContent = `${data.weather[0].main}, ${Math.round(data.main.temp)}°F`;
+    } catch(e) {
+        weatherEl.textContent = 'Weather unavailable';
+    }
+}
+updateWeather();
+</script>
+
 </body>
 </html>
