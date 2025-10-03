@@ -1,139 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Music Bingo</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #ff758c, #ff7eb3);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        h1 { margin-top: 20px; }
-
-        .player-controls {
-            margin: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1em;
-            margin: 0 10px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            color: white;
-            background: #6a5acd;
-            transition: 0.3s;
-        }
-
-        button:hover { background: #836fff; }
-
-        #current-song {
-            margin-top: 10px;
-            font-size: 1.2em;
-        }
-
-        .bingo-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 80px);
-            grid-template-rows: repeat(5, 80px);
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .bingo-cell {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .bingo-cell.marked { background: rgba(0,0,0,0.7); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Bingo</title>
+<link href="style.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #1a1a1a;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #222;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    header h1 {
+        color: #ff3366;
+        margin: 0;
+        font-size: 28px;
+    }
+    header .datetime {
+        color: #ff3366;
+        font-size: 18px;
+    }
+    header a.logout {
+        color: #ff3366;
+        text-decoration: none;
+        font-size: 18px;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        gap: 20px;
+    }
+    .playlist-container {
+        flex: 2;
+        background-color: #2a2a2a;
+        padding: 20px;
+        border-radius: 15px;
+    }
+    .playlist-container h2 {
+        color: #ff3366;
+        margin-bottom: 10px;
+    }
+    select {
+        font-size: 16px;
+        padding: 6px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: none;
+    }
+    ul.playlist {
+        list-style: none;
+        padding: 0;
+        max-height: 300px;
+        overflow-y: scroll;
+        border: 1px solid #444;
+        border-radius: 8px;
+    }
+    ul.playlist li {
+        padding: 6px 10px;
+        border-bottom: 1px solid #444;
+        cursor: pointer;
+    }
+    ul.playlist li:hover {
+        background-color: #ff3366;
+        color: #000;
+    }
+    .card-checker {
+        flex: 1;
+        background-color: #2a2a2a;
+        padding: 20px;
+        border-radius: 15px;
+    }
+    .card-checker h2 {
+        color: #ff3366;
+    }
+    .card-checker input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: none;
+    }
+    .card-display {
+        margin-top: 20px;
+        background-color: #111;
+        padding: 10px;
+        border-radius: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    audio {
+        width: 100%;
+        margin-bottom: 10px;
+        outline: none;
+    }
+</style>
 </head>
 <body>
-    <h1>Music Bingo</h1>
+<header>
+    <h1>Welcome Mike!</h1>
+    <div class="datetime" id="datetime"></div>
+    <a href="login.html" class="logout">Logout</a>
+</header>
 
-    <div class="player-controls">
-        <button id="start-btn">Start</button>
-        <button id="next-btn">Next</button>
-        <button id="pause-btn">Pause</button>
-        <div id="current-song">Current Song: None</div>
+<div class="container">
+    <div class="playlist-container">
+        <h2>Select Set:</h2>
+        <select id="setSelect">
+            <option value="country90">90's Country Vol 1</option>
+            <option value="popHits">Pop Hits Vol 1</option>
+            <option value="classicRock">Classic Rock Vol 1</option>
+        </select>
+
+        <audio id="audioPlayer" controls></audio>
+        <ul class="playlist" id="playlist"></ul>
     </div>
 
-    <div class="bingo-grid" id="bingo-grid">
-        <!-- 5x5 Bingo cells -->
+    <div class="card-checker">
+        <h2>Card Checker</h2>
+        <p>Enter card number to check:</p>
+        <input type="text" id="cardNumber" placeholder="Card #">
+        <button id="checkCard" style="margin-top: 10px; padding: 12px; font-size: 16px; background-color: #ff3366; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Check</button>
+
+        <div class="card-display" id="cardDisplay">
+            <p>No card selected.</p>
+        </div>
     </div>
+</div>
 
-    <audio id="audio-player" controls style="display:none;"></audio>
+<script>
+// Mock song lists
+const songs = {
+    country90: [
+        "Achy, Breaky Heart - Billy Ray Cyrus", "Boot Scootin' Boogie - Brooks & Dunn", "Friends in Low Places - Garth Brooks",
+        "Strawberry Wine - Deana Carter", "This Kiss - Faith Hill", "I Swear - John Michael Montgomery", "When You Say Nothing At All - Alison Krauss",
+        "Any Man of Mine - Shania Twain", "Chattahoochee - Alan Jackson", "I Like It, I Love It - Tim McGraw",
+        "She's in Love with the Boy - Trisha Yearwood", "How Do I Live - LeAnn Rimes", "The Dance - Garth Brooks",
+        "Independence Day - Martina McBride", "I Hope You Dance - Lee Ann Womack", "No One Else on Earth - Wynonna", "Should've Been a Cowboy - Toby Keith",
+        "Love Gets Me Every Time - Shania Twain", "My Maria - Brooks & Dunn", "Check Yes or No - George Strait",
+        "Guys Do It All the Time - Mindy McCready", "I Like the Sound of That - Rascal Flatts", "Breathe - Faith Hill",
+        "Carrying Your Love with Me - George Strait", "It's Your Love - Tim McGraw & Faith Hill", "Where the Green Grass Grows - Tim McGraw",
+        "Here’s a Quarter - Travis Tritt", "I Will Always Love You - Dolly Parton", "If Tomorrow Never Comes - Garth Brooks",
+        "Blue Clear Sky - George Strait", "To Make You Feel My Love - Trisha Yearwood", "That's the Way - Jo Dee Messina",
+        "How Was I to Know - Reba McEntire", "You’re Still the One - Shania Twain", "Gone Country - Alan Jackson",
+        "You Look Good in My Shirt - Keith Urban", "Don't Take the Girl - Tim McGraw", "Two Sparrows in a Hurricane - Tanya Tucker",
+        "Man! I Feel Like a Woman! - Shania Twain", "Better Man - Little Big Town", "Amazed - Lonestar",
+        "I Cross My Heart - George Strait", "The Keeper of the Stars - Tracy Byrd", "Check Yes or No - George Strait",
+        "Here in the Real World - Alan Jackson", "When She Cries - Restless Heart", "I Can Love You Like That - John Michael Montgomery",
+        "She’s Every Woman - Garth Brooks", "Forever and Ever, Amen - Randy Travis", "Little Miss Honky Tonk - Brooks & Dunn",
+        "How Do You Like Me Now?! - Toby Keith", "If I Could Make a Living - Clay Walker", "Don't Rock the Jukebox - Alan Jackson",
+        "I Cross My Heart - George Strait", "Hold On - Diamond Rio", "Love, Me - Collin Raye", "It Matters to Me - Faith Hill",
+        "My Next Thirty Years - Tim McGraw", "I'll Still Be Loving You - Restless Heart", "Living in a Moment - Ty Herndon",
+        "The Woman in Me - Shania Twain", "If Your Heart Ain’t Busy Tonight - Tanya Tucker", "Little Rock - Reba McEntire",
+        "I Can Love You Like That - All 4 One (Country Version)", "Don't Take the Girl - Tim McGraw", "She's in Love with the Boy - Trisha Yearwood",
+        "I Swear - John Michael Montgomery", "Check Yes or No - George Strait", "Breathe - Faith Hill", "Carrying Your Love with Me - George Strait",
+        "It's Your Love - Tim McGraw & Faith Hill", "Where the Green Grass Grows - Tim McGraw", "Blue Clear Sky - George Strait",
+        "Two Sparrows in a Hurricane - Tanya Tucker", "Man! I Feel Like a Woman! - Shania Twain", "Amazed - Lonestar"
+    ],
+    popHits: [
+        "…Baby One More Time - Britney Spears", "Genie in a Bottle - Christina Aguilera", "I Want It That Way - Backstreet Boys",
+        "Bye Bye Bye - NSYNC", "Torn - Natalie Imbruglia", "MMMBop - Hanson", "Livin' la Vida Loca - Ricky Martin",
+        "I’ll Be Missing You - Puff Daddy", "All Star - Smash Mouth", "Waterfalls - TLC", 
+        "Believe - Cher", "Say My Name - Destiny's Child", "I Don’t Want to Miss a Thing - Aerosmith",
+        "No Scrubs - TLC", "Barbie Girl - Aqua", "…Baby One More Time - Britney Spears", "Genie in a Bottle - Christina Aguilera",
+        "I Want It That Way - Backstreet Boys", "Bye Bye Bye - NSYNC", "Torn - Natalie Imbruglia", 
+        "MMMBop - Hanson", "Livin' la Vida Loca - Ricky Martin", "I’ll Be Missing You - Puff Daddy", 
+        "All Star - Smash Mouth", "Waterfalls - TLC", "Believe - Cher", "Say My Name - Destiny's Child",
+        "I Don’t Want to Miss a Thing - Aerosmith", "No Scrubs - TLC", "Barbie Girl - Aqua", "Wannabe - Spice Girls",
+        "One Week - Barenaked Ladies", "Semi-Charmed Life - Third Eye Blind", "Creep - Radiohead",
+        "Iris - Goo Goo Dolls", "Kiss Me - Sixpence None the Richer", "My Heart Will Go On - Celine Dion",
+        "I Want You Back - NSYNC", "Everybody (Backstreet's Back) - Backstreet Boys", "Tearin' Up My Heart - NSYNC",
+        "Mmm Mmm Mmm Mmm - Crash Test Dummies", "Un-Break My Heart - Toni Braxton", "Smooth - Santana ft. Rob Thomas",
+        "What’s Up? - 4 Non Blondes", "Ironic - Alanis Morissette", "Black Velvet - Alannah Myles",
+        "Baby Got Back - Sir Mix-A-Lot", "U Can’t Touch This - MC Hammer", "Vision of Love - Mariah Carey",
+        "This Kiss - Faith Hill", "Always Be My Baby - Mariah Carey", "Poison - Bell Biv DeVoe", "Killing Me Softly - Fugees",
+        "Water Runs Dry - Boyz II Men", "I’ll Make Love to You - Boyz II Men", "Smooth Criminal - Michael Jackson",
+        "I Want It That Way - Backstreet Boys", "Bye Bye Bye - NSYNC", "Say My Name - Destiny's Child",
+        "Iris - Goo Goo Dolls", "Livin' la Vida Loca - Ricky Martin", "Barbie Girl - Aqua", "MMMBop - Hanson",
+        "Genie in a Bottle - Christina Aguilera", "All Star - Smash Mouth", "Wannabe - Spice Girls", "Ironic - Alanis Morissette",
+        "Torn - Natalie Imbruglia", "Un-Break My Heart - Toni Braxton", "Believe - Cher", "Smooth - Santana ft. Rob Thomas",
+        "My Heart Will Go On - Celine Dion", "Creep - Radiohead", "I Don’t Want to Miss a Thing - Aerosmith"
+    ],
+    classicRock: [
+        "Stairway to Heaven - Led Zeppelin", "Bohemian Rhapsody - Queen", "Hotel California - Eagles",
+        "Sweet Child O' Mine - Guns N' Roses", "Back in Black - AC/DC", "Born to Run - Bruce Springsteen",
+        "Free Bird - Lynyrd Skynyrd", "Smoke on the Water - Deep Purple", "Comfortably Numb - Pink Floyd",
+        "Livin' on a Prayer - Bon Jovi", "Sweet Home Alabama - Lynyrd Skynyrd", "Another Brick in the Wall - Pink Floyd",
+        "Don't Stop Believin' - Journey", "Paint It Black - The Rolling Stones", "We Will Rock You - Queen",
+        "Every Breath You Take - The Police", "Paradise City - Guns N' Roses", "Highway to Hell - AC/DC",
+        "Ramble On - Led Zeppelin", "Start Me Up - The Rolling Stones", "Free Bird - Lynyrd Skynyrd",
+        "Hotel California - Eagles", "Wish You Were Here - Pink Floyd", "Sharp Dressed Man - ZZ Top",
+        "Sweet Child O' Mine - Guns N' Roses", "Livin' on a Prayer - Bon Jovi", "Dream On - Aerosmith",
+        "Comfortably Numb - Pink Floyd", "Bohemian Rhapsody - Queen", "Back in Black - AC/DC",
+        "More Than a Feeling - Boston", "Baba O'Riley - The Who", "Paint It Black - The Rolling Stones",
+        "Layla - Derek & The Dominos", "TNT - AC/DC", "Don't Fear The Reaper - Blue Öyster Cult",
+        "Barracuda - Heart", "Come Together - The Beatles", "Rock You Like a Hurricane - Scorpions",
+        "Walk This Way - Aerosmith", "Kashmir - Led Zeppelin", "Rebel Yell - Billy Idol",
+        "Jumpin' Jack Flash - The Rolling Stones", "Whole Lotta Love - Led Zeppelin", "Sweet Emotion - Aerosmith",
+        "Fortunate Son - Creedence Clearwater Revival", "Light My Fire - The Doors", "Gimme Shelter - The Rolling Stones",
+        "Radar Love - Golden Earring", "Free Bird - Lynyrd Skynyrd", "Stairway to Heaven - Led Zeppelin",
+        "Bohemian Rhapsody - Queen", "Smoke on the Water - Deep Purple", "Hotel California - Eagles",
+        "Back in Black - AC/DC", "Sweet Child O' Mine - Guns N' Roses", "Livin' on a Prayer - Bon Jovi",
+        "Comfortably Numb - Pink Floyd", "Don't Stop Believin' - Journey", "Paint It Black - The Rolling Stones",
+        "We Will Rock You - Queen", "Every Breath You Take - The Police", "Paradise City - Guns N' Roses",
+        "Highway to Hell - AC/DC", "Ramble On - Led Zeppelin", "Start Me Up - The Rolling Stones",
+        "Free Bird - Lynyrd Skynyrd", "Wish You Were Here - Pink Floyd", "Sharp Dressed Man - ZZ Top"
+    ]
+};
 
-    <script>
-        const audioPlayer = document.getElementById("audio-player");
-        const startBtn = document.getElementById("start-btn");
-        const nextBtn = document.getElementById("next-btn");
-        const pauseBtn = document.getElementById("pause-btn");
-        const currentSong = document.getElementById("current-song");
+const setSelect = document.getElementById('setSelect');
+const playlistEl = document.getElementById('playlist');
+const audioPlayer = document.getElementById('audioPlayer');
+const datetimeEl = document.getElementById('datetime');
+const cardDisplay = document.getElementById('cardDisplay');
 
-        const musicFolder = "music/"; // your folder name
-        let songs = []; // will hold file names
-
-        // Populate songs array with all mp3s
-        // Example: '12345.mp3', '67890.mp3' (replace with your actual file names)
-        // For now, we'll simulate with placeholder numbers:
-        for (let i = 1; i <= 20; i++) {
-            songs.push(i + ".mp3"); // replace with actual files or script to read them
-        }
-
-        let currentIndex = 0;
-
-        function getRandomSong() {
-            const index = Math.floor(Math.random() * songs.length);
-            currentIndex = index;
-            return songs[index];
-        }
-
-        function playSong(songFile) {
-            audioPlayer.src = musicFolder + songFile;
+function loadPlaylist(set) {
+    playlistEl.innerHTML = '';
+    songs[set].forEach((song, idx) => {
+        const li = document.createElement('li');
+        li.textContent = song;
+        li.onclick = () => {
+            audioPlayer.src = `music/${set}/${idx+1}.mp3`; 
             audioPlayer.play();
-            currentSong.textContent = "Current Song: " + songFile;
-        }
+        };
+        playlistEl.appendChild(li);
+    });
+}
 
-        startBtn.addEventListener("click", () => {
-            const song = getRandomSong();
-            playSong(song);
-        });
+// Initial load
+loadPlaylist(setSelect.value);
+setSelect.addEventListener('change', () => loadPlaylist(setSelect.value));
 
-        nextBtn.addEventListener("click", () => {
-            const song = getRandomSong();
-            playSong(song);
-        });
+// Datetime
+function updateDatetime() {
+    const now = new Date();
+    datetimeEl.textContent = now.toLocaleString();
+}
+setInterval(updateDatetime, 1000);
+updateDatetime();
 
-        pauseBtn.addEventListener("click", () => {
-            audioPlayer.pause();
-        });
-
-        // Generate bingo grid
-        const grid = document.getElementById("bingo-grid");
-        for (let i = 0; i < 25; i++) {
-            const cell = document.createElement("div");
-            cell.className = "bingo-cell";
-            cell.textContent = i + 1; // placeholder number
-            cell.addEventListener("click", () => {
-                cell.classList.toggle("marked");
-            });
-            grid.appendChild(cell);
-        }
-    </script>
+// Card checker (mock)
+document.getElementById('checkCard').addEventListener('click', () => {
+    const cardNum = document.getElementById('cardNumber').value;
+    cardDisplay.innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
+});
+</script>
 </body>
 </html>
