@@ -3,53 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Music Bingo - 00s Playlist</title>
+<title>Music Bingo</title>
 <style>
-    body { background-color: #1a1a1a; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
-    h1 { color: #ff3366; }
-    .playlist-item { padding: 5px; cursor: pointer; border-bottom: 1px solid #444; }
-    .playlist-item:hover { background-color: #ff3366; color: #000; }
+  body { background: #1a1a1a; color: #fff; font-family: Arial, sans-serif; margin:0; padding:0;}
+  h1 { color: #ff3366; text-align:center; margin:20px 0;}
+  #playlist { max-width: 600px; margin: auto; padding:0; list-style:none; }
+  #playlist li { padding:10px; border-bottom:1px solid #444; cursor:pointer;}
+  #playlist li:hover { background:#ff3366; color:#000;}
+  #audio-player { width: 100%; max-width: 600px; display:block; margin: 20px auto;}
+  #play-random { display:block; margin: 10px auto; padding:10px 20px; font-size:16px; background:#ff3366; color:#fff; border:none; border-radius:5px; cursor:pointer;}
 </style>
 </head>
 <body>
 
-<h1>00s Playlist</h1>
-<div id="playlist"></div>
+<h1>Music Bingo - 00s Playlist</h1>
+
+<ul id="playlist">
+  <li>Loading songs...</li>
+</ul>
+
 <button id="play-random">Play Random Song</button>
 <audio id="audio-player" controls></audio>
 
 <script>
+// Array to store songs
 let songs00s = [];
 
+// Fetch JSON playlist
 fetch("00s_songs.json")
-  .then(res => res.json())
+  .then(response => response.json())
   .then(data => {
     songs00s = data;
     populatePlaylist();
   })
-  .catch(err => console.error("Error loading songs:", err));
+  .catch(err => {
+    console.error("Error loading songs:", err);
+    const playlistEl = document.getElementById("playlist");
+    playlistEl.innerHTML = "<li>Error loading playlist.</li>";
+  });
 
+// Populate playlist in HTML
 function populatePlaylist() {
-  const playlistDiv = document.getElementById("playlist");
-  playlistDiv.innerHTML = "";
-  
-  songs00s.forEach((song, index) => {
-    const div = document.createElement("div");
-    div.textContent = `${song.title} - ${song.artist.replace("_","")}`;
-    div.className = "playlist-item";
-    div.addEventListener("click", () => playSong(index));
-    playlistDiv.appendChild(div);
+  const playlistEl = document.getElementById("playlist");
+  playlistEl.innerHTML = ""; // clear previous content
+  songs00s.forEach((song, idx) => {
+    const li = document.createElement("li");
+    li.textContent = `${song.title} - ${song.artist}`;
+    li.addEventListener("click", () => playSong(idx));
+    playlistEl.appendChild(li);
   });
 }
 
+// Play a song by index
 function playSong(index) {
   const song = songs00s[index];
-  const player = document.getElementById("audio-player");
-  player.src = song.file;
-  player.play();
+  const audio = document.getElementById("audio-player");
+  audio.src = song.file; // relative path to mp3
+  audio.play();
 }
 
+// Play random song
 document.getElementById("play-random").addEventListener("click", () => {
+  if (songs00s.length === 0) return;
   const randomIndex = Math.floor(Math.random() * songs00s.length);
   playSong(randomIndex);
 });
