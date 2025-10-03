@@ -140,16 +140,15 @@ document.getElementById('checkCard').addEventListener('click', () => {
     document.getElementById('cardDisplay').innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
 });
 
-// ----------- Load 00s JSON Playlist -----------
-let songs00s = [];
-
-fetch("00s_songs.json")
-  .then(response => response.json())
-  .then(data => {
-    songs00s = data;
-    populatePlaylist();
-  })
-  .catch(err => console.error("Error loading songs:", err));
+// 00s Songs embedded directly
+const songs00s = [
+    { "title": "Oops!... I Did It Again", "artist": "Britney Spears", "file": "00s/01_oops.mp3" },
+    { "title": "Bye Bye Bye", "artist": "NSYNC", "file": "00s/02_bye_bye_bye.mp3" },
+    { "title": "Genie in a Bottle", "artist": "Christina Aguilera", "file": "00s/03_genie.mp3" },
+    { "title": "I Want It That Way", "artist": "Backstreet Boys", "file": "00s/04_i_want_it_that_way.mp3" },
+    { "title": "Torn", "artist": "Natalie Imbruglia", "file": "00s/05_torn.mp3" }
+    // Add more songs here, making sure filenames match your 00s folder
+];
 
 // Populate playlist
 function populatePlaylist() {
@@ -159,11 +158,11 @@ function populatePlaylist() {
     songs00s.forEach((song, index) => {
         const li = document.createElement("li");
         li.textContent = `${song.title} - ${song.artist}`;
-        li.style.cursor = "pointer";
         li.addEventListener("click", () => playSong(index));
         playlistEl.appendChild(li);
     });
 }
+populatePlaylist();
 
 // Play a song by index
 function playSong(index) {
@@ -171,7 +170,6 @@ function playSong(index) {
     const audio = document.getElementById("audioPlayer");
     audio.src = song.file;
     audio.play();
-    console.log("Playing:", song.title, "-", song.artist);
 }
 
 // Play random song
