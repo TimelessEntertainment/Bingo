@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Music Bingo - 00s</title>
+  <title>Music Bingo</title>
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Fredoka+One&display=swap" rel="stylesheet">
@@ -55,6 +55,7 @@
       justify-content: flex-start;
       padding: 20px;
       gap: 40px;
+      flex-wrap: wrap;
     }
 
     .player-section {
@@ -99,11 +100,11 @@
     }
 
     .bingo-section {
-      width: 600px; /* wider container to fit full grid */
       display: flex;
       flex-direction: column;
       gap: 10px;
       align-items: center;
+      flex: 1 1 500px;
     }
 
     .bingo-section input {
@@ -133,22 +134,25 @@
     .bingo-placeholder {
       background-color: #1e1e1e;
       border-radius: 12px;
-      padding: 10px;
+      padding: 20px;
       width: 100%;
-      min-height: 600px; /* large enough to show 5x5 grid */
-      max-height: 800px;
-      overflow-y: auto;
-      border: 2px solid #00ffff;
+      min-height: 400px;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
+      grid-auto-rows: 80px;
+      gap: 8px;
+      border: 2px solid #00ffff;
+      overflow: hidden;
     }
 
     .bingo-placeholder div {
-      padding: 15px;
-      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       border-radius: 6px;
+      background-color: #121212;
       text-align: center;
+      padding: 5px;
       font-size: 0.9rem;
     }
 
@@ -159,13 +163,11 @@
     }
 
     /* Scrollbar style */
-    .playlist-container::-webkit-scrollbar,
-    .bingo-placeholder::-webkit-scrollbar {
+    .playlist-container::-webkit-scrollbar {
       width: 8px;
     }
 
-    .playlist-container::-webkit-scrollbar-thumb,
-    .bingo-placeholder::-webkit-scrollbar-thumb {
+    .playlist-container::-webkit-scrollbar-thumb {
       background-color: #ff0099;
       border-radius: 4px;
     }
@@ -179,6 +181,7 @@
       Music Bingo - <span id="categoryTitle">00s</span>
       <select id="categoryDropdown">
         <option value="00s">00s</option>
+        <option value="40s_up">#41+</option>
       </select>
     </h1>
   </header>
@@ -206,111 +209,91 @@
     const bingoPlaceholder = document.querySelector('.bingo-placeholder');
 
     let playedSongs = [];
+    let bingoCards = {};
 
     function shuffleArray(arr) {
       return arr.sort(() => Math.random() - 0.5);
     }
 
-    function highlightPlayedSongs() {
-      const bingoSquares = bingoPlaceholder.querySelectorAll('div');
-      bingoSquares.forEach(square => {
-        if(playedSongs.includes(square.textContent)) {
-          square.classList.add('played');
-        } else {
-          square.classList.remove('played');
-        }
-      });
-
-      document.querySelectorAll('.playlist-item').forEach(item => {
-        if(playedSongs.includes(item.dataset.title)) {
-          item.classList.add('active');
-        } else {
-          item.classList.remove('active');
-        }
-      });
-    }
-
     function loadPlaylist(category) {
       categoryTitle.textContent = category;
       fetch(`${category}_songs.json`)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(songs => {
-          songs = shuffleArray(songs);
-
           playlistContainer.innerHTML = '';
-          songs.forEach(song => {
+          const shuffledSongs = shuffleArray(songs);
+          shuffledSongs.forEach(song => {
             const item = document.createElement('div');
             item.classList.add('playlist-item');
-            item.textContent = `${song.title} - ${song.artist}`;
+            item.textContent = song.title;
             item.dataset.file = song.file;
             item.dataset.title = song.title;
 
             item.addEventListener('click', () => {
               audioPlayer.src = song.file;
               audioPlayer.play();
+              document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
+              item.classList.add('active');
 
-              if(!playedSongs.includes(song.title)) {
-                playedSongs.push(song.title);
-              }
-              highlightPlayedSongs();
+              if (!playedSongs.includes(song.title)) playedSongs.push(song.title);
+              highlightCard();
             });
 
             playlistContainer.appendChild(item);
           });
 
-          if(songs.length > 0) {
-            audioPlayer.src = songs[0].file;
-            if(!playedSongs.includes(songs[0].title)) {
-              playedSongs.push(songs[0].title);
-            }
-            highlightPlayedSongs();
+          // Auto-load first song
+          if (shuffledSongs.length > 0) {
+            audioPlayer.src = shuffledSongs[0].file;
+            playlistContainer.firstChild.classList.add('active');
+            if (!playedSongs.includes(shuffledSongs[0].title)) playedSongs.push(shuffledSongs[0].title);
           }
         })
         .catch(err => {
-          console.error('Error loading playlist:', err);
+          console.error(err);
           playlistContainer.textContent = 'Failed to load playlist';
         });
+
+      // Load bingo cards for this category
+      fetch(`${category}_cards.json`)
+        .then(res => res.json())
+        .then(cards => {
+          bingoCards = cards;
+          bingoPlaceholder.innerHTML = '';
+        })
+        .catch(err => {
+          console.error(err);
+          bingoPlaceholder.innerHTML = 'Failed to load cards';
+        });
+
+      playedSongs = [];
     }
 
-    loadPlaylist(categoryDropdown.value);
+    function highlightCard() {
+      const cardNumber = cardNumberInput.value.trim();
+      if (!bingoCards[cardNumber]) return;
+
+      const card = bingoCards[cardNumber];
+      bingoPlaceholder.innerHTML = '';
+      for (let r = 0; r < card.length; r++) {
+        for (let c = 0; c < card[r].length; c++) {
+          const title = card[r][c];
+          const div = document.createElement('div');
+          div.textContent = title;
+          if (playedSongs.includes(title)) div.classList.add('played');
+          bingoPlaceholder.appendChild(div);
+        }
+      }
+    }
+
+    checkCardButton.addEventListener('click', highlightCard);
 
     categoryDropdown.addEventListener('change', () => {
-      playedSongs = [];
       loadPlaylist(categoryDropdown.value);
     });
 
-    checkCardButton.addEventListener('click', () => {
-      const cardNumber = cardNumberInput.value.trim();
-      if(cardNumber === '') {
-        alert('Please enter a card number');
-        return;
-      }
-
-      fetch('00s_cards.json')
-        .then(res => res.json())
-        .then(cards => {
-          const card = cards[cardNumber];
-          if(!card) {
-            alert('Card not found!');
-            bingoPlaceholder.innerHTML = '';
-            return;
-          }
-
-          let html = '';
-          card.forEach(row => {
-            row.forEach(title => {
-              const playedClass = playedSongs.includes(title) ? 'played' : '';
-              html += `<div class="${playedClass}">${title}</div>`;
-            });
-          });
-
-          bingoPlaceholder.innerHTML = html;
-          highlightPlayedSongs();
-        })
-        .catch(err => {
-          console.error('Error loading card:', err);
-        });
-    });
+    // Initial load
+    loadPlaylist(categoryDropdown.value);
   </script>
 </body>
 </html>
