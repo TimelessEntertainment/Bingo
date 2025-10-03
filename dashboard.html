@@ -4,93 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Hub Dashboard</title>
-    <link href="style.css" rel="stylesheet">
-    <script src="script.js" defer></script>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <style>
         body {
             margin: 0;
             font-family: 'Montserrat', sans-serif;
-            background-color: #111;
+            background-color: #1a1a1a;
             color: #fff;
         }
         .top-bar {
-            background: linear-gradient(90deg, #ff416c, #ff4b2b);
-            padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .top-bar .welcome {
-            display: flex;
-            gap: 20px;
-        }
-        .top-bar .logout a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .date-time {
+            background: linear-gradient(to right, #ff3c3c, #ff8c00);
+            padding: 15px 30px;
             font-size: 18px;
+            font-weight: bold;
         }
-        .games-container {
+        .game-container {
             display: flex;
             justify-content: center;
+            margin-top: 100px;
             gap: 50px;
-            margin-top: 80px;
         }
         .game-button {
-            width: 200px;
-            height: 150px;
-            background: linear-gradient(135deg, #f7971e, #ffd200);
-            color: #111;
-            font-size: 22px;
-            font-weight: bold;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-decoration: none;
+            width: 250px;
+            height: 150px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #ff0066, #ffcc00);
+            border: none;
             border-radius: 15px;
+            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            text-align: center;
         }
         .game-button:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px #ffd200;
+            box-shadow: 0 0 20px rgba(255,255,255,0.6);
         }
     </style>
 </head>
 <body>
 
+    <!-- Top Bar -->
     <div class="top-bar">
-        <div class="welcome">
-            <span id="welcome-text">Welcome, user@example.com</span>
-            <span class="date-time" id="date-time"></span>
-        </div>
-        <div class="logout">
-            <a href="login.html">Logout</a>
+        <div id="welcome-text">Welcome <span id="user-email">user@example.com</span></div>
+        <div id="datetime-weather">
+            <span id="current-datetime"></span> | <span id="weather">72°F Sunny</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href="login.html" style="color: #fff; text-decoration: none;">Logout</a>
         </div>
     </div>
 
-    <div class="games-container">
-        <a href="../BDSM Trivia/index.html" class="game-button">BDSM Trivia</a>
+    <!-- Games -->
+    <div class="game-container">
+        <a href="BDSM%20Trivia/index.html" class="game-button">BDSM Trivia</a>
         <a href="music_bingo.html" class="game-button">Music Bingo</a>
-        <a href="../Bingo/bingo.html" class="game-button">Extreme Bar Bingo</a>
+        <a href="Bingo/bingo.html" class="game-button">Extreme Bar Bingo</a>
     </div>
 
 <script>
-    // Update date and time dynamically
+    // Replace this with dynamic user email if available
+    const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+    document.getElementById('user-email').innerText = userEmail;
+
+    // Update date and time every second
     function updateDateTime() {
         const now = new Date();
-        const dateTimeStr = now.toLocaleString();
-        document.getElementById('date-time').textContent = dateTimeStr;
+        const options = { weekday: 'long', month: '2-digit', day: '2-digit', year: 'numeric' };
+        const dateStr = now.toLocaleDateString(undefined, options);
+        const timeStr = now.toLocaleTimeString();
+        document.getElementById('current-datetime').innerText = `${dateStr} ${timeStr}`;
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
-    // Pull email from session storage or login page
-    const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
-    document.getElementById('welcome-text').textContent = 'Welcome, ' + userEmail;
+    // Placeholder for weather API if you want dynamic weather
+    // document.getElementById('weather').innerText = "72°F Sunny"; 
 </script>
 
 </body>
