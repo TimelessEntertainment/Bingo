@@ -46,32 +46,36 @@ button { background: #ff3366; color: #fff; }
 </div>
 
 <script>
-// Datetime
+// Update datetime
 function updateDatetime() {
     document.getElementById('datetime').textContent = new Date().toLocaleString();
 }
 setInterval(updateDatetime, 1000);
 updateDatetime();
 
-// Card checker
+// Card checker (mock)
 document.getElementById('checkCard').addEventListener('click', () => {
     const cardNum = document.getElementById('cardNumber').value;
     document.getElementById('cardDisplay').innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
 });
 
-// --- Playlist from JSON ---
+// Load playlist from JSON
 const playlistEl = document.getElementById("playlist");
 const audioPlayer = document.getElementById("audioPlayer");
 
 fetch("00s_songs.json")
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) throw new Error("JSON file not found");
+    return response.json();
+  })
   .then(songs => {
+    // Populate playlist
     songs.forEach((song, index) => {
         const li = document.createElement("li");
         li.textContent = `${song.title} - ${song.artist}`;
         li.addEventListener("click", () => {
             audioPlayer.src = song.file;
-            audioPlayer.play().catch(err => console.error(err));
+            audioPlayer.play().catch(err => console.error("Playback error:", err));
         });
         playlistEl.appendChild(li);
     });
@@ -80,13 +84,13 @@ fetch("00s_songs.json")
     document.getElementById("play-random").addEventListener("click", () => {
         const randomIndex = Math.floor(Math.random() * songs.length);
         audioPlayer.src = songs[randomIndex].file;
-        audioPlayer.play().catch(err => console.error(err));
+        audioPlayer.play().catch(err => console.error("Playback error:", err));
     });
-})
-.catch(err => {
-    console.error("Failed to load playlist:", err);
-    playlistEl.innerHTML = "<li style='color:red;'>Failed to load songs</li>";
-});
+  })
+  .catch(err => {
+      console.error("Failed to load playlist:", err);
+      playlistEl.innerHTML = "<li style='color:red;'>Failed to load songs</li>";
+  });
 </script>
 
 </body>
