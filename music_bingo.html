@@ -4,147 +4,194 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Music Bingo</title>
+<link href="style.css" rel="stylesheet">
 <style>
-body {
-    background-color: #1a1a1a;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-header {
-    background-color: #222;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-header h1 {
-    color: #ff3366;
-    margin: 0;
-    font-size: 28px;
-}
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 20px;
-    gap: 20px;
-}
-.playlist-container {
-    flex: 2;
-    background-color: #2a2a2a;
-    padding: 20px;
-    border-radius: 15px;
-}
-.playlist-container h2 {
-    color: #ff3366;
-    margin-bottom: 10px;
-}
-#playlist {
-    max-height: 500px;
-    overflow-y: scroll;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 10px;
-}
-.song-item {
-    padding: 6px 10px;
-    border-bottom: 1px solid #444;
-    cursor: pointer;
-}
-.song-item:hover {
-    background-color: #ff3366;
-    color: #000;
-}
-audio {
-    width: 100%;
-    margin-top: 10px;
-}
-select {
-    padding: 6px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-}
+    body {
+        background-color: #1a1a1a;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #222;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    header h1 {
+        color: #ff3366;
+        margin: 0;
+        font-size: 28px;
+    }
+    header .datetime {
+        color: #ff3366;
+        font-size: 18px;
+    }
+    header a.logout {
+        color: #ff3366;
+        text-decoration: none;
+        font-size: 18px;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        gap: 20px;
+    }
+    .playlist-container {
+        flex: 2;
+        background-color: #2a2a2a;
+        padding: 20px;
+        border-radius: 15px;
+    }
+    .playlist-container h2 {
+        color: #ff3366;
+        margin-bottom: 10px;
+    }
+    select {
+        font-size: 16px;
+        padding: 6px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        border: none;
+    }
+    ul.playlist {
+        list-style: none;
+        padding: 0;
+        max-height: 300px;
+        overflow-y: scroll;
+        border: 1px solid #444;
+        border-radius: 8px;
+    }
+    ul.playlist li {
+        padding: 6px 10px;
+        border-bottom: 1px solid #444;
+        cursor: pointer;
+    }
+    ul.playlist li:hover {
+        background-color: #ff3366;
+        color: #000;
+    }
+    .card-checker {
+        flex: 1;
+        background-color: #2a2a2a;
+        padding: 20px;
+        border-radius: 15px;
+    }
+    .card-checker h2 {
+        color: #ff3366;
+    }
+    .card-checker input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: none;
+    }
+    .card-display {
+        margin-top: 20px;
+        background-color: #111;
+        padding: 10px;
+        border-radius: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    audio {
+        width: 100%;
+        margin-bottom: 10px;
+        outline: none;
+    }
 </style>
 </head>
 <body>
-
 <header>
-    <h1>Music Bingo</h1>
+    <h1>Welcome Mike!</h1>
+    <div class="datetime" id="datetime"></div>
+    <a href="login.html" class="logout">Logout</a>
 </header>
 
 <div class="container">
     <div class="playlist-container">
-        <h2>Select Playlist</h2>
-        <select id="playlistSelect">
-            <option value="00s">00s</option>
-            <option value="90sCountry">90s Country</option>
-            <option value="popHits">Pop Hits</option>
-            <option value="classicRock">Classic Rock</option>
+        <h2>Select Set:</h2>
+        <select id="setSelect">
+            <option value="00s">00's Hits</option>
+            <!-- Add more sets here if you make more JSON files -->
         </select>
 
-        <div id="playlist">Loading playlist...</div>
         <audio id="audioPlayer" controls></audio>
+        <ul class="playlist" id="playlist"></ul>
+    </div>
+
+    <div class="card-checker">
+        <h2>Card Checker</h2>
+        <p>Enter card number to check:</p>
+        <input type="text" id="cardNumber" placeholder="Card #">
+        <button id="checkCard" style="margin-top: 10px; padding: 12px; font-size: 16px; background-color: #ff3366; color: #fff; border: none; border-radius: 8px; cursor: pointer;">Check</button>
+
+        <div class="card-display" id="cardDisplay">
+            <p>No card selected.</p>
+        </div>
     </div>
 </div>
 
 <script>
-// GitHub repo base
+// GitHub raw URL base
 const repoBase = "https://raw.githubusercontent.com/mikewallace/TimelessEntertainment/main/";
 
-// Map playlists to JSON files
-const playlistFiles = {
-    "00s": "00s_songs.json",
-    "90sCountry": "90s_country_songs.json",
-    "popHits": "pop_hits_songs.json",
-    "classicRock": "classic_rock_songs.json"
-};
+// Elements
+const setSelect = document.getElementById("setSelect");
+const playlistEl = document.getElementById("playlist");
+const audioPlayer = document.getElementById("audioPlayer");
+const datetimeEl = document.getElementById("datetime");
+const cardDisplay = document.getElementById("cardDisplay");
 
 let currentSongs = [];
 
 // Load playlist JSON
-function loadPlaylist(playlistKey) {
-    const playlistDiv = document.getElementById("playlist");
-    playlistDiv.textContent = "Loading playlist...";
-    fetch(repoBase + playlistFiles[playlistKey])
-    .then(res => res.json())
-    .then(songs => {
-        currentSongs = songs;
-        playlistDiv.innerHTML = "";
-        songs.forEach((song, idx) => {
-            const songDiv = document.createElement("div");
-            songDiv.className = "song-item";
-            songDiv.textContent = `${song.title} - ${song.artist}`;
-            songDiv.addEventListener("click", () => playSong(idx));
-            playlistDiv.appendChild(songDiv);
+function loadPlaylist(set) {
+    playlistEl.innerHTML = "Loading playlist...";
+    fetch(repoBase + set + "_songs.json")
+        .then(res => res.json())
+        .then(data => {
+            currentSongs = data;
+            playlistEl.innerHTML = "";
+            data.forEach((song, idx) => {
+                const li = document.createElement("li");
+                li.textContent = `${song.title} - ${song.artist}`;
+                li.onclick = () => {
+                    // Encode spaces for GitHub raw URL
+                    audioPlayer.src = repoBase + song.file.replace(/ /g, "%20");
+                    audioPlayer.play();
+                };
+                playlistEl.appendChild(li);
+            });
+        })
+        .catch(err => {
+            console.error("Error loading playlist:", err);
+            playlistEl.innerHTML = "Failed to load playlist.";
         });
-    })
-    .catch(err => {
-        console.error("Error loading playlist:", err);
-        playlistDiv.textContent = "Failed to load playlist.";
-    });
-}
-
-// Play song by index
-function playSong(idx) {
-    const song = currentSongs[idx];
-    const audioPlayer = document.getElementById("audioPlayer");
-    const fileName = song.file.replace(/ /g, "%20"); // handle spaces in filenames
-    audioPlayer.src = repoBase + fileName;
-    audioPlayer.play();
 }
 
 // Initial load
-const selectEl = document.getElementById("playlistSelect");
-loadPlaylist(selectEl.value);
+loadPlaylist(setSelect.value);
+setSelect.addEventListener("change", () => loadPlaylist(setSelect.value));
 
-// Change playlist
-selectEl.addEventListener("change", () => {
-    loadPlaylist(selectEl.value);
+// Datetime
+function updateDatetime() {
+    const now = new Date();
+    datetimeEl.textContent = now.toLocaleString();
+}
+setInterval(updateDatetime, 1000);
+updateDatetime();
+
+// Card checker (mock)
+document.getElementById('checkCard').addEventListener("click", () => {
+    const cardNum = document.getElementById("cardNumber").value;
+    cardDisplay.innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
 });
 </script>
-
 </body>
 </html>
