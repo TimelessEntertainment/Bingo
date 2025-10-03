@@ -5,235 +5,196 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Music Bingo 00s</title>
 <style>
-body {
-  font-family: 'Arial', sans-serif;
-  background-color: #111;
-  color: #fff;
-  margin: 0;
-  padding: 0;
-}
-header {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 20px;
-  background-color: #222;
-  border-bottom: 3px solid #00ffff;
-  align-items: center;
-}
-header h1 {
-  font-size: 1.5rem;
-  color: #00ffff;
-  margin: 0;
-}
-header .welcome {
-  font-size: 1rem;
-  color: #fff;
-}
-.main-content {
-  display: flex;
-  padding: 20px;
-}
-.left-panel {
-  flex: 1;
-}
-.right-panel {
-  width: 250px;
-  margin-left: 20px;
-}
-.audio-player {
-  width: 100%;
-  margin-bottom: 10px;
-}
-#playlistContainer {
-  max-height: 400px;
-  overflow-y: auto;
-  background-color: #222;
-  border: 2px solid #00ffff;
-  padding: 10px;
-}
-.playlist-item {
-  padding: 5px;
-  cursor: pointer;
-  border-bottom: 1px solid #00ffff33;
-}
-.playlist-item.active {
-  background-color: #00ffff44;
-  font-weight: bold;
-}
-.bingo-section input {
-  width: 100%;
-  padding: 5px;
-  margin-bottom: 5px;
-  border: 2px solid #00ffff;
-  background-color: #111;
-  color: #fff;
-}
-.bingo-section button {
-  width: 100%;
-  padding: 8px;
-  background-color: #00ffff;
-  border: none;
-  color: #111;
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-.bingo-section button:hover {
-  background-color: #00cccc;
-}
-.bingo-placeholder table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-.bingo-placeholder td {
-  border: 1px solid #00ffff;
-  padding: 5px;
-  font-size: 0.8rem;
-  text-align: center;
-  background-color: #1e1e1e;
-}
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #1a1a1a; /* Dark bar background */
+    color: #fff;
+  }
+
+  /* Banner */
+  .banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #111;
+    padding: 15px 20px;
+    border-bottom: 3px solid #ff4d4d;
+  }
+
+  .banner h1 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .banner .title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffcc00; /* Golden fun bar color */
+  }
+
+  /* Main container */
+  .container {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  /* Player and playlist section */
+  .player-section {
+    flex: 1;
+  }
+
+  audio {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .playlist {
+    background-color: #222;
+    padding: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 2px solid #ff4d4d;
+  }
+
+  .playlist-item {
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .playlist-item.playing {
+    background-color: #ffcc00;
+    color: #000;
+    font-weight: bold;
+  }
+
+  /* Right side: check card */
+  .check-card-section {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .check-card-section input {
+    padding: 8px;
+    border: 2px solid #ff4d4d;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  .check-card-section button {
+    padding: 10px;
+    background-color: #ff4d4d;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .check-card-section button:hover {
+    background-color: #ff1a1a;
+  }
+
+  /* Dropdown for category selection */
+  .category-dropdown {
+    margin-left: 20px;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 4px;
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="welcome">Welcome Mike</div>
-  <h1>Music Bingo 00s</h1>
-</header>
+<!-- Banner -->
+<div class="banner">
+  <h1>Welcome Mike</h1>
+  <div class="title">Music Bingo <span id="category-label">00s</span></div>
+  <select id="category-select" class="category-dropdown">
+    <option value="00s">00s</option>
+    <!-- future categories can be added here -->
+  </select>
+</div>
 
-<div class="main-content">
-  <div class="left-panel">
-    <audio id="audioPlayer" class="audio-player" controls></audio>
-    <div id="playlistContainer"></div>
+<!-- Main content -->
+<div class="container">
+  <!-- Player and playlist -->
+  <div class="player-section">
+    <audio id="audio-player" controls></audio>
+    <div id="playlist" class="playlist"></div>
   </div>
 
-  <div class="right-panel bingo-section">
-    <input type="text" id="cardNumberInput" placeholder="Enter Card Number">
-    <button id="checkCardBtn">Check Card</button>
-    <div id="bingoCardContainer" class="bingo-placeholder"></div>
+  <!-- Check card section -->
+  <div class="check-card-section">
+    <input type="text" id="card-number" placeholder="Enter Card #">
+    <button id="check-card-btn">Check Card</button>
   </div>
 </div>
 
 <script>
-const audioPlayer = document.getElementById('audioPlayer');
-const playlistContainer = document.getElementById('playlistContainer');
-const cardInput = document.getElementById('cardNumberInput');
-const checkButton = document.getElementById('checkCardBtn');
-const bingoContainer = document.getElementById('bingoCardContainer');
-
-let playlist = [];
+const playlistEl = document.getElementById('playlist');
+const audioPlayer = document.getElementById('audio-player');
 let currentIndex = 0;
-let currentCard = [];
+let playlist = [];
 
-// Shuffle array with seed
-function seededShuffle(array, seed) {
-  let rng = x => {
-    x = Math.sin(x) * 10000;
-    return x - Math.floor(x);
-  };
-  let arr = array.slice();
-  for (let i = arr.length - 1; i > 0; i--) {
-    seed = (seed * 9301 + 49297) % 233280;
-    let j = Math.floor(rng(seed) * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-// Load playlist
+// Load playlist from JSON
 fetch('00s_songs.json')
-  .then(res => res.json())
+  .then(response => response.json())
   .then(data => {
     playlist = data;
-
-    function loadSong(index) {
-      audioPlayer.src = playlist[index].file;
-      highlightCurrent(index);
-      highlightOnCard(playlist[index].title);
+    renderPlaylist();
+    if (playlist.length > 0) {
+      loadSong(0);
     }
-
-    function highlightCurrent(index) {
-      document.querySelectorAll('.playlist-item').forEach((el, i) => {
-        el.classList.toggle('active', i === index);
-      });
-    }
-
-    playlist.forEach((song, index) => {
-      const item = document.createElement('div');
-      item.className = 'playlist-item';
-      item.textContent = `${song.title} – ${song.artist}`;
-      item.addEventListener('click', () => {
-        currentIndex = index;
-        loadSong(index);
-        audioPlayer.play();
-      });
-      playlistContainer.appendChild(item);
-    });
-
-    if(playlist.length > 0) loadSong(0);
-
-    audioPlayer.addEventListener('ended', () => {
-      currentIndex = (currentIndex + 1) % playlist.length;
-      loadSong(currentIndex);
-      audioPlayer.play();
-    });
   })
   .catch(err => {
-    playlistContainer.textContent = 'Failed to load playlist';
+    playlistEl.innerHTML = 'Error loading playlist';
     console.error(err);
   });
 
-// Generate bingo card
-function generateBingoCard(cardNum) {
-  const seed = parseInt(cardNum) || Math.floor(Math.random() * 99999);
-  const titles = playlist.map(s => s.title);
-  const shuffled = seededShuffle(titles, seed);
-  currentCard = shuffled.slice(0, 25);
-
-  let table = document.createElement('table');
-  table.innerHTML = '';
-
-  for (let i = 0; i < 5; i++) {
-    let row = document.createElement('tr');
-    for (let j = 0; j < 5; j++) {
-      let idx = i * 5 + j;
-      let cell = document.createElement('td');
-      cell.textContent = currentCard[idx];
-      if(i === 2 && j === 2) { // free center
-        cell.textContent = 'FREE';
-        cell.style.backgroundColor = '#00ffff33';
-        cell.style.fontWeight = 'bold';
-      }
-      row.appendChild(cell);
-    }
-    table.appendChild(row);
-  }
-
-  bingoContainer.innerHTML = '';
-  bingoContainer.appendChild(table);
-}
-
-// Highlight song on card
-function highlightOnCard(songTitle) {
-  if(!currentCard.length) return;
-  const table = bingoContainer.querySelector('table');
-  if(!table) return;
-  Array.from(table.querySelectorAll('td')).forEach((cell, idx) => {
-    if(currentCard[idx] === songTitle) {
-      cell.style.backgroundColor = '#00ffff88';
-      cell.style.fontWeight = 'bold';
-    }
+function renderPlaylist() {
+  playlistEl.innerHTML = '';
+  playlist.forEach((song, index) => {
+    const item = document.createElement('div');
+    item.className = 'playlist-item';
+    item.textContent = `${song.title} - ${song.artist}`;
+    item.addEventListener('click', () => loadSong(index));
+    playlistEl.appendChild(item);
   });
 }
 
-checkButton.addEventListener('click', () => {
-  const cardNum = cardInput.value.trim();
-  if(!cardNum) {
-    alert('Please enter a card number!');
+function loadSong(index) {
+  currentIndex = index;
+  audioPlayer.src = playlist[index].file;
+  audioPlayer.play();
+  updatePlayingHighlight();
+}
+
+function updatePlayingHighlight() {
+  const items = document.querySelectorAll('.playlist-item');
+  items.forEach((item, idx) => {
+    item.classList.toggle('playing', idx === currentIndex);
+  });
+}
+
+// Auto play next song
+audioPlayer.addEventListener('ended', () => {
+  if (currentIndex < playlist.length - 1) {
+    loadSong(currentIndex + 1);
+  }
+});
+
+// Check card button (placeholder functionality)
+document.getElementById('check-card-btn').addEventListener('click', () => {
+  const cardNumber = document.getElementById('card-number').value.trim();
+  if (!cardNumber) {
+    alert('Enter a card number');
     return;
   }
-  generateBingoCard(cardNum);
+  alert(`Check card functionality for Card #${cardNumber} coming soon!`);
 });
 </script>
 
