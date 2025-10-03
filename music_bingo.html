@@ -8,8 +8,8 @@
   body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background-color: #1a1a1a; /* Dark bar background */
-    color: #fff;
+    background-color: #0d0d0d; /* keep your approved dark background */
+    color: #ffffff; /* white text */
   }
 
   /* Banner */
@@ -17,9 +17,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #111;
+    background-color: #111; /* approved dark header */
     padding: 15px 20px;
-    border-bottom: 3px solid #ff4d4d;
+    border-bottom: 3px solid #ff9900; /* your approved accent color */
   }
 
   .banner h1 {
@@ -30,7 +30,7 @@
   .banner .title {
     font-size: 24px;
     font-weight: bold;
-    color: #ffcc00; /* Golden fun bar color */
+    color: #ffcc00; /* your approved color */
   }
 
   /* Main container */
@@ -40,9 +40,9 @@
     gap: 20px;
   }
 
-  /* Player and playlist section */
+  /* Player and playlist section (condensed, left side) */
   .player-section {
-    flex: 1;
+    width: 350px; /* condensed width */
   }
 
   audio {
@@ -51,11 +51,11 @@
   }
 
   .playlist {
-    background-color: #222;
+    background-color: #1a1a1a; /* approved dark container */
     padding: 10px;
     max-height: 400px;
     overflow-y: auto;
-    border: 2px solid #ff4d4d;
+    border: 2px solid #ff9900; /* your accent border */
   }
 
   .playlist-item {
@@ -64,14 +64,14 @@
   }
 
   .playlist-item.playing {
-    background-color: #ffcc00;
+    background-color: #ffcc00; /* highlighted song color */
     color: #000;
     font-weight: bold;
   }
 
   /* Right side: check card */
   .check-card-section {
-    width: 200px;
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -79,23 +79,23 @@
 
   .check-card-section input {
     padding: 8px;
-    border: 2px solid #ff4d4d;
+    border: 2px solid #ff9900;
     border-radius: 4px;
     font-size: 16px;
   }
 
   .check-card-section button {
     padding: 10px;
-    background-color: #ff4d4d;
+    background-color: #ff9900;
     border: none;
-    color: #fff;
+    color: #000;
     font-weight: bold;
     cursor: pointer;
     border-radius: 4px;
   }
 
   .check-card-section button:hover {
-    background-color: #ff1a1a;
+    background-color: #ff7700;
   }
 
   /* Dropdown for category selection */
@@ -115,7 +115,7 @@
   <div class="title">Music Bingo <span id="category-label">00s</span></div>
   <select id="category-select" class="category-dropdown">
     <option value="00s">00s</option>
-    <!-- future categories can be added here -->
+    <!-- future categories -->
   </select>
 </div>
 
@@ -187,7 +187,7 @@ audioPlayer.addEventListener('ended', () => {
   }
 });
 
-// Check card button (placeholder functionality)
+// Check card button (placeholder)
 document.getElementById('check-card-btn').addEventListener('click', () => {
   const cardNumber = document.getElementById('card-number').value.trim();
   if (!cardNumber) {
