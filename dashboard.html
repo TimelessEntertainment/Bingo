@@ -6,113 +6,60 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body {
-            background: url('../background.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Arial', sans-serif;
+            background: #1a1a1a;
             color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
             margin: 0;
             padding: 0;
         }
-
-        .container {
-            text-align: center;
-            padding: 50px 20px;
-        }
-
         h1 {
-            font-size: 48px;
-            margin-bottom: 10px;
-            color: #ff0000;
-            text-shadow: 2px 2px 8px #000;
+            font-size: 3em;
+            margin: 30px 0 10px 0;
+            color: #ff0000; /* Extreme Bar style */
+            text-shadow: 2px 2px #fff;
         }
-
-        .datetime {
-            margin-bottom: 30px;
-            font-size: 20px;
-        }
-
         .games-container {
             display: flex;
             justify-content: center;
-            gap: 20px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
+            gap: 30px;
+            margin-top: 50px;
         }
-
         .game-btn {
-            background: linear-gradient(45deg, #00ffcc, #00ccff);
-            border: none;
-            padding: 20px 40px;
-            font-size: 24px;
-            color: #000;
+            background: linear-gradient(45deg, #00ffcc, #0066ff);
+            color: #fff;
+            padding: 30px 50px;
+            font-size: 1.5em;
             font-weight: bold;
-            text-decoration: none;
             border-radius: 15px;
-            box-shadow: 2px 2px 15px rgba(0,0,0,0.5);
+            cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
         }
-
         .game-btn:hover {
             transform: scale(1.1);
-            box-shadow: 2px 2px 25px rgba(0,0,0,0.7);
+            box-shadow: 0 0 20px #00ffcc;
         }
-
         .logout-link {
-            display: inline-block;
-            margin-top: 20px;
-            font-size: 16px;
+            display: block;
+            margin-top: 50px;
             color: #00ffcc;
+            font-size: 1.2em;
             text-decoration: underline;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome Michael!</h1>
-        <div class="datetime" id="datetime"></div>
-
-        <div class="games-container">
-            <a href="music_bingo.html" class="game-btn">Music Bingo</a>
-            <a href="../BDSM Trivia/index2.html" class="game-btn">BDSM Trivia</a>
-            <a href="../Bingo/bingo.html" class="game-btn">Bingo</a>
-        </div>
-
-        <a class="logout-link" id="logout-link">Logout</a>
+    <h1>Welcome, Michael!</h1>
+    <div class="games-container">
+        <a class="game-btn" href="music_bingo.html">Music Bingo</a>
+        <a class="game-btn" href="BDSM Trivia/index.html">BDSM Trivia</a>
+        <a class="game-btn" href="Bingo/bingo.html">Bingo</a>
     </div>
+    <span class="logout-link" onclick="logout()">Logout</span>
 
-    <script type="module">
-        // Update date and time
-        function updateDateTime() {
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('datetime').innerHTML = now.toLocaleDateString(undefined, options) + ' | ' + timeString;
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-
-        // Firebase Logout
-        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyCizkQLkKhxlQSRZ7J378jLDVlqPdadu78",
-          authDomain: "music-bingo-login.firebaseapp.com",
-          projectId: "music-bingo-login",
-          storageBucket: "music-bingo-login.firebasestorage.app",
-          messagingSenderId: "814220049067",
-          appId: "1:814220049067:web:b7a771786e67e9bfa055ee"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        document.getElementById('logout-link').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = "login.html";
-            });
-        });
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
