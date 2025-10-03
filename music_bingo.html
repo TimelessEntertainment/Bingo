@@ -1,202 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Music Bingo 00s</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #0d0d0d; /* keep your approved dark background */
-    color: #ffffff; /* white text */
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Bingo - 00s</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Fredoka+One&display=swap" rel="stylesheet">
 
-  /* Banner */
-  .banner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #111; /* approved dark header */
-    padding: 15px 20px;
-    border-bottom: 3px solid #ff9900; /* your approved accent color */
-  }
+  <style>
+    /* --- General Layout --- */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      color: #f0f0f0;
+      font-family: 'Poppins', sans-serif;
+    }
 
-  .banner h1 {
-    font-size: 20px;
-    margin: 0;
-  }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: linear-gradient(90deg, #ff0099, #00ffff);
+      color: white;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
 
-  .banner .title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #ffcc00; /* your approved color */
-  }
+    header h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
 
-  /* Main container */
-  .container {
-    display: flex;
-    padding: 20px;
-    gap: 20px;
-  }
+    header .welcome {
+      font-size: 1.1rem;
+    }
 
-  /* Player and playlist section (condensed, left side) */
-  .player-section {
-    width: 350px; /* condensed width */
-  }
+    header select {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #1e1e1e;
+      color: #fff;
+    }
 
-  audio {
-    width: 100%;
-    margin-bottom: 10px;
-  }
+    main {
+      display: flex;
+      justify-content: flex-start; /* shift everything left */
+      padding: 20px;
+      gap: 20px;
+    }
 
-  .playlist {
-    background-color: #1a1a1a; /* approved dark container */
-    padding: 10px;
-    max-height: 400px;
-    overflow-y: auto;
-    border: 2px solid #ff9900; /* your accent border */
-  }
+    .player-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 400px;
+    }
 
-  .playlist-item {
-    padding: 5px;
-    cursor: pointer;
-  }
+    audio {
+      width: 100%;
+      height: 40px;
+      border-radius: 8px;
+      outline: none;
+    }
 
-  .playlist-item.playing {
-    background-color: #ffcc00; /* highlighted song color */
-    color: #000;
-    font-weight: bold;
-  }
+    .playlist-container {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 2px solid #ff0099;
+    }
 
-  /* Right side: check card */
-  .check-card-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+    .playlist-item {
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
 
-  .check-card-section input {
-    padding: 8px;
-    border: 2px solid #ff9900;
-    border-radius: 4px;
-    font-size: 16px;
-  }
+    .playlist-item:hover {
+      background-color: #ff0099;
+      color: #121212;
+    }
 
-  .check-card-section button {
-    padding: 10px;
-    background-color: #ff9900;
-    border: none;
-    color: #000;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 4px;
-  }
+    .playlist-item.active {
+      background-color: #00ffff;
+      color: #121212;
+      font-weight: 600;
+    }
 
-  .check-card-section button:hover {
-    background-color: #ff7700;
-  }
+    .bingo-section {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
 
-  /* Dropdown for category selection */
-  .category-dropdown {
-    margin-left: 20px;
-    padding: 5px;
-    font-size: 16px;
-    border-radius: 4px;
-  }
-</style>
+    #cardNumber {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #ff0099;
+      background-color: #1e1e1e;
+      color: #fff;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .check-button {
+      background-color: #ff0099;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
+    }
+
+    .check-button:hover {
+      background-color: #ff66cc;
+    }
+
+    .bingo-placeholder {
+      width: 100%;
+      background-color: #1e1e1e;
+      border: 2px solid #00ffff;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      min-height: 150px;
+      color: #fff;
+    }
+
+    h2 {
+      font-family: 'Fredoka One', cursive;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #00ffff;
+    }
+
+    /* Scrollbar style */
+    .playlist-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .playlist-container::-webkit-scrollbar-thumb {
+      background-color: #ff0099;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Banner -->
-<div class="banner">
-  <h1>Welcome Mike</h1>
-  <div class="title">Music Bingo <span id="category-label">00s</span></div>
-  <select id="category-select" class="category-dropdown">
-    <option value="00s">00s</option>
-    <!-- future categories -->
-  </select>
-</div>
+  <header>
+    <div class="welcome">Welcome Mike</div>
+    <h1>
+      Music Bingo - 00s
+      <select id="categoryDropdown">
+        <option value="00s">00s</option>
+        <!-- future categories can be added here -->
+      </select>
+    </h1>
+  </header>
 
-<!-- Main content -->
-<div class="container">
-  <!-- Player and playlist -->
-  <div class="player-section">
-    <audio id="audio-player" controls></audio>
-    <div id="playlist" class="playlist"></div>
-  </div>
+  <main>
+    <div class="player-section">
+      <audio id="audioPlayer" controls></audio>
+      <div class="playlist-container" id="playlist"></div>
+    </div>
 
-  <!-- Check card section -->
-  <div class="check-card-section">
-    <input type="text" id="card-number" placeholder="Enter Card #">
-    <button id="check-card-btn">Check Card</button>
-  </div>
-</div>
+    <div class="bingo-section">
+      <input type="text" id="cardNumber" placeholder="Enter Card Number">
+      <button class="check-button" id="checkCardButton">Check Card</button>
+      <div class="bingo-placeholder">Bingo Card Here</div>
+    </div>
+  </main>
 
-<script>
-const playlistEl = document.getElementById('playlist');
-const audioPlayer = document.getElementById('audio-player');
-let currentIndex = 0;
-let playlist = [];
+  <script>
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const playlistContainer = document.getElementById('playlist');
+    const checkCardButton = document.getElementById('checkCardButton');
+    const cardNumberInput = document.getElementById('cardNumber');
 
-// Load playlist from JSON
-fetch('00s_songs.json')
-  .then(response => response.json())
-  .then(data => {
-    playlist = data;
-    renderPlaylist();
-    if (playlist.length > 0) {
-      loadSong(0);
+    function loadPlaylist(category) {
+      fetch(`${category}_songs.json`)
+        .then(response => response.json())
+        .then(songs => {
+          playlistContainer.innerHTML = ''; // clear previous
+          songs.forEach((song, index) => {
+            const item = document.createElement('div');
+            item.classList.add('playlist-item');
+            item.textContent = `${song.title} - ${song.artist}`;
+            item.dataset.file = song.file;
+
+            item.addEventListener('click', () => {
+              audioPlayer.src = song.file;
+              audioPlayer.play();
+              document.querySelectorAll('.playlist-item').forEach(i => i.classList.remove('active'));
+              item.classList.add('active');
+            });
+
+            playlistContainer.appendChild(item);
+          });
+
+          // Auto-load first song
+          if(songs.length > 0) {
+            audioPlayer.src = songs[0].file;
+            playlistContainer.firstChild.classList.add('active');
+          }
+        })
+        .catch(err => {
+          console.error('Error loading playlist:', err);
+          playlistContainer.textContent = 'Failed to load playlist';
+        });
     }
-  })
-  .catch(err => {
-    playlistEl.innerHTML = 'Error loading playlist';
-    console.error(err);
-  });
 
-function renderPlaylist() {
-  playlistEl.innerHTML = '';
-  playlist.forEach((song, index) => {
-    const item = document.createElement('div');
-    item.className = 'playlist-item';
-    item.textContent = `${song.title} - ${song.artist}`;
-    item.addEventListener('click', () => loadSong(index));
-    playlistEl.appendChild(item);
-  });
-}
+    // Initial load
+    loadPlaylist(categoryDropdown.value);
 
-function loadSong(index) {
-  currentIndex = index;
-  audioPlayer.src = playlist[index].file;
-  audioPlayer.play();
-  updatePlayingHighlight();
-}
+    // Handle category change
+    categoryDropdown.addEventListener('change', () => {
+      loadPlaylist(categoryDropdown.value);
+    });
 
-function updatePlayingHighlight() {
-  const items = document.querySelectorAll('.playlist-item');
-  items.forEach((item, idx) => {
-    item.classList.toggle('playing', idx === currentIndex);
-  });
-}
-
-// Auto play next song
-audioPlayer.addEventListener('ended', () => {
-  if (currentIndex < playlist.length - 1) {
-    loadSong(currentIndex + 1);
-  }
-});
-
-// Check card button (placeholder)
-document.getElementById('check-card-btn').addEventListener('click', () => {
-  const cardNumber = document.getElementById('card-number').value.trim();
-  if (!cardNumber) {
-    alert('Enter a card number');
-    return;
-  }
-  alert(`Check card functionality for Card #${cardNumber} coming soon!`);
-});
-</script>
+    // Handle Check Card
+    checkCardButton.addEventListener('click', () => {
+      const cardNumber = cardNumberInput.value.trim();
+      if(cardNumber === '') {
+        alert('Please enter a card number');
+        return;
+      }
+      document.querySelector('.bingo-placeholder').textContent = `Showing Bingo Card #${cardNumber}`;
+      // TODO: eventually display actual card and highlight played songs
+    });
+  </script>
 
 </body>
 </html>
