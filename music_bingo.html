@@ -59,38 +59,34 @@ document.getElementById('checkCard').addEventListener('click', () => {
     document.getElementById('cardDisplay').innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
 });
 
-// Load playlist from JSON
+// Embedded JSON data
+const songs00s = [
+  { "title": "Oops!... I Did It Again", "artist": "Britney Spears", "file": "00s/01_oops.mp3" },
+  { "title": "Bye Bye Bye", "artist": "NSYNC", "file": "00s/02_bye_bye_bye.mp3" },
+  { "title": "Genie in a Bottle", "artist": "Christina Aguilera", "file": "00s/03_genie.mp3" }
+  // add all your songs here...
+];
+
 const playlistEl = document.getElementById("playlist");
 const audioPlayer = document.getElementById("audioPlayer");
 
-fetch("00s_songs.json")
-  .then(response => {
-    if (!response.ok) throw new Error("JSON file not found");
-    return response.json();
-  })
-  .then(songs => {
-    // Populate playlist
-    songs.forEach((song, index) => {
-        const li = document.createElement("li");
-        li.textContent = `${song.title} - ${song.artist}`;
-        li.addEventListener("click", () => {
-            audioPlayer.src = song.file;
-            audioPlayer.play().catch(err => console.error("Playback error:", err));
-        });
-        playlistEl.appendChild(li);
-    });
-
-    // Play random
-    document.getElementById("play-random").addEventListener("click", () => {
-        const randomIndex = Math.floor(Math.random() * songs.length);
-        audioPlayer.src = songs[randomIndex].file;
+// Populate playlist
+songs00s.forEach((song, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${song.title} - ${song.artist}`;
+    li.addEventListener("click", () => {
+        audioPlayer.src = song.file;
         audioPlayer.play().catch(err => console.error("Playback error:", err));
     });
-  })
-  .catch(err => {
-      console.error("Failed to load playlist:", err);
-      playlistEl.innerHTML = "<li style='color:red;'>Failed to load songs</li>";
-  });
+    playlistEl.appendChild(li);
+});
+
+// Play random
+document.getElementById("play-random").addEventListener("click", () => {
+    const randomIndex = Math.floor(Math.random() * songs00s.length);
+    audioPlayer.src = songs00s[randomIndex].file;
+    audioPlayer.play().catch(err => console.error("Playback error:", err));
+});
 </script>
 
 </body>
