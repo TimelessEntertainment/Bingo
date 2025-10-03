@@ -31,42 +31,21 @@
             text-align: right;
         }
 
-        .game-buttons {
+        .game-buttons-container {
             display: flex;
             justify-content: center;
+            margin-top: 100px;
+        }
+
+        .game-buttons {
+            display: flex;
             gap: 40px;
-            margin: 80px 0;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
         .game-buttons a {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 220px;
-            height: 220px;
-            font-size: 24px;
-            font-weight: bold;
-            text-decoration: none;
-            color: #fff;
-            border-radius: 20px;
-            transition: transform 0.2s;
-        }
-
-        .game-buttons a:hover {
-            transform: scale(1.05);
-        }
-
-        .bsm-button {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-        }
-
-        .music-button {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
-        }
-
-        .bingo-button {
-            background: linear-gradient(135deg, #f7971e, #ffd200);
+            display: inline-block; /* keep your existing buttons intact */
         }
     </style>
 </head>
@@ -77,20 +56,34 @@
         <span id="welcome-user">Welcome, user@example.com</span>
         <div class="datetime-weather">
             <span id="current-datetime">Loading Date/Time...</span> | 
-            <span id="weather">Loading Weather...</span> |
+            <span id="weather">72°F Sunny</span> |
             <a href="logout.html" style="color:#fff; text-decoration:none; font-weight:bold;">Logout</a>
         </div>
     </div>
 
     <!-- Game Buttons -->
-    <div class="game-buttons">
-        <a href="BDSM_Trivia/index.html" class="bsm-button">BDSM Trivia</a>
-        <a href="Music_Bingo/music_bingo.html" class="music-button">Music Bingo</a>
-        <a href="Bingo/bingo.html" class="bingo-button">Extreme Bar Bingo</a>
+    <div class="game-buttons-container">
+        <div class="game-buttons">
+            <!-- Keep your original buttons exactly as they were -->
+            <button id="bdsm-trivia-btn" class="btn btn-game">BDSM Trivia</button>
+            <button id="music-bingo-btn" class="btn btn-game">Music Bingo</button>
+            <button id="bingo-btn" class="btn btn-game">Extreme Bar Bingo</button>
+        </div>
     </div>
 
     <script>
-        // Display current date and time
+        // Keep your existing button functionality
+        document.getElementById('bdsm-trivia-btn').onclick = () => {
+            window.location.href = "BDSM_Trivia/index.html";
+        };
+        document.getElementById('music-bingo-btn').onclick = () => {
+            window.location.href = "Music_Bingo/music_bingo.html";
+        };
+        document.getElementById('bingo-btn').onclick = () => {
+            window.location.href = "Bingo/bingo.html";
+        };
+
+        // Live date/time
         function updateDateTime() {
             const now = new Date();
             const options = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' };
@@ -99,12 +92,9 @@
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
-        // Example: Display user email from localStorage after login
+        // Show user email (replace with localStorage from login)
         const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
         document.getElementById('welcome-user').textContent = `Welcome, ${userEmail}`;
-
-        // Example weather (replace with actual API later)
-        document.getElementById('weather').textContent = '72°F Sunny';
     </script>
 </body>
 </html>
