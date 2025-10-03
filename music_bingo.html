@@ -3,72 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>00s Playlist</title>
+<title>Music Bingo</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-  h1 { text-align: center; }
-  ul { list-style: none; padding: 0; }
-  li { padding: 10px; border-bottom: 1px solid #ccc; cursor: pointer; }
-  li:hover { background: #e0e0e0; }
-  li.playing { background: #a0d8f0; }
-  audio { width: 100%; margin-top: 20px; }
+body {
+    background-color: #1a1a1a;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: #222;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header h1 {
+    color: #ff3366;
+    margin: 0;
+    font-size: 28px;
+}
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+    gap: 20px;
+}
+.playlist-container {
+    flex: 2;
+    background-color: #2a2a2a;
+    padding: 20px;
+    border-radius: 15px;
+}
+.playlist-container h2 {
+    color: #ff3366;
+    margin-bottom: 10px;
+}
+#playlist {
+    max-height: 500px;
+    overflow-y: scroll;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+}
+.song-item {
+    padding: 6px 10px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+}
+.song-item:hover {
+    background-color: #ff3366;
+    color: #000;
+}
+audio {
+    width: 100%;
+    margin-top: 10px;
+}
+select {
+    padding: 6px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+}
 </style>
 </head>
 <body>
 
-<h1>00s Playlist</h1>
-<ul id="playlist"></ul>
-<audio id="audioPlayer" controls></audio>
+<header>
+    <h1>Music Bingo</h1>
+</header>
+
+<div class="container">
+    <div class="playlist-container">
+        <h2>Select Playlist</h2>
+        <select id="playlistSelect">
+            <option value="00s">00s</option>
+            <option value="90sCountry">90s Country</option>
+            <option value="popHits">Pop Hits</option>
+            <option value="classicRock">Classic Rock</option>
+        </select>
+
+        <div id="playlist">Loading playlist...</div>
+        <audio id="audioPlayer" controls></audio>
+    </div>
+</div>
 
 <script>
-const username = 'YOUR_GITHUB_USERNAME'; // Change this
-const repo = 'REPO_NAME'; // Change this
-const branch = 'main'; // Or master if your repo uses master
+// GitHub repo base
+const repoBase = "https://raw.githubusercontent.com/mikewallace/TimelessEntertainment/main/";
 
-const audioPlayer = document.getElementById('audioPlayer');
-const playlistEl = document.getElementById('playlist');
+// Map playlists to JSON files
+const playlistFiles = {
+    "00s": "00s_songs.json",
+    "90sCountry": "90s_country_songs.json",
+    "popHits": "pop_hits_songs.json",
+    "classicRock": "classic_rock_songs.json"
+};
 
-fetch(`https://raw.githubusercontent.com/${username}/${repo}/${branch}/00s_songs.json`)
-  .then(response => response.json())
-  .then(data => {
-    data.forEach((song, index) => {
-      const li = document.createElement('li');
-      li.textContent = `${song.title} - ${song.artist}`;
-      li.addEventListener('click', () => playSong(index));
-      playlistEl.appendChild(li);
+let currentSongs = [];
+
+// Load playlist JSON
+function loadPlaylist(playlistKey) {
+    const playlistDiv = document.getElementById("playlist");
+    playlistDiv.textContent = "Loading playlist...";
+    fetch(repoBase + playlistFiles[playlistKey])
+    .then(res => res.json())
+    .then(songs => {
+        currentSongs = songs;
+        playlistDiv.innerHTML = "";
+        songs.forEach((song, idx) => {
+            const songDiv = document.createElement("div");
+            songDiv.className = "song-item";
+            songDiv.textContent = `${song.title} - ${song.artist}`;
+            songDiv.addEventListener("click", () => playSong(idx));
+            playlistDiv.appendChild(songDiv);
+        });
+    })
+    .catch(err => {
+        console.error("Error loading playlist:", err);
+        playlistDiv.textContent = "Failed to load playlist.";
     });
+}
 
-    let currentSongIndex = 0;
+// Play song by index
+function playSong(idx) {
+    const song = currentSongs[idx];
+    const audioPlayer = document.getElementById("audioPlayer");
+    const fileName = song.file.replace(/ /g, "%20"); // handle spaces in filenames
+    audioPlayer.src = repoBase + fileName;
+    audioPlayer.play();
+}
 
-    function playSong(index) {
-      currentSongIndex = index;
-      const song = data[index];
-      const mp3Url = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${encodeURIComponent(song.file)}`;
-      audioPlayer.src = mp3Url;
-      audioPlayer.play();
-      updatePlaying();
-    }
+// Initial load
+const selectEl = document.getElementById("playlistSelect");
+loadPlaylist(selectEl.value);
 
-    function updatePlaying() {
-      const lis = playlistEl.querySelectorAll('li');
-      lis.forEach((li, idx) => {
-        li.classList.toggle('playing', idx === currentSongIndex);
-      });
-    }
-
-    audioPlayer.addEventListener('ended', () => {
-      currentSongIndex++;
-      if (currentSongIndex >= data.length) currentSongIndex = 0;
-      playSong(currentSongIndex);
-    });
-
-    // Auto-load first song
-    playSong(0);
-  })
-  .catch(err => {
-    console.error('Error loading playlist:', err);
-    playlistEl.innerHTML = '<li>Failed to load playlist.</li>';
-  });
+// Change playlist
+selectEl.addEventListener("change", () => {
+    loadPlaylist(selectEl.value);
+});
 </script>
 
 </body>
