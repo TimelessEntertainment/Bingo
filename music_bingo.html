@@ -3,96 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Music Bingo - 00s</title>
+<title>Music Bingo - 00s Playlist</title>
 <style>
-body { background: #1a1a1a; color: #fff; font-family: Arial; margin: 0; padding: 0; }
-header { background: #222; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-header h1 { color: #ff3366; margin: 0; font-size: 28px; }
-header .datetime { color: #ff3366; font-size: 18px; }
-.container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; gap: 20px; }
-.playlist-container, .card-checker { background: #2a2a2a; padding: 20px; border-radius: 15px; }
-.playlist-container { flex: 2; min-width: 300px; }
-.card-checker { flex: 1; min-width: 250px; }
-ul.playlist { list-style: none; padding: 0; max-height: 300px; overflow-y: auto; border: 1px solid #444; border-radius: 8px; }
-ul.playlist li { padding: 6px 10px; border-bottom: 1px solid #444; cursor: pointer; }
-ul.playlist li:hover { background: #ff3366; color: #000; }
-audio { width: 100%; margin-bottom: 10px; }
-button, input[type=text] { width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: none; font-size: 16px; cursor: pointer; }
-button { background: #ff3366; color: #fff; }
-.card-display { margin-top: 20px; background: #111; padding: 10px; border-radius: 8px; max-height: 300px; overflow-y: auto; }
+    body { background-color: #1a1a1a; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #ff3366; }
+    .playlist-item { padding: 5px; cursor: pointer; border-bottom: 1px solid #444; }
+    .playlist-item:hover { background-color: #ff3366; color: #000; }
 </style>
 </head>
 <body>
 
-<header>
-<h1>Welcome Mike!</h1>
-<div class="datetime" id="datetime"></div>
-</header>
-
-<div class="container">
-<div class="playlist-container">
-<h2>00s Playlist</h2>
-<audio id="audioPlayer" controls></audio>
-<ul class="playlist" id="playlist"></ul>
+<h1>00s Playlist</h1>
+<div id="playlist"></div>
 <button id="play-random">Play Random Song</button>
-</div>
-
-<div class="card-checker">
-<h2>Card Checker</h2>
-<input type="text" id="cardNumber" placeholder="Card #">
-<button id="checkCard">Check</button>
-<div class="card-display" id="cardDisplay"><p>No card selected.</p></div>
-</div>
-</div>
+<audio id="audio-player" controls></audio>
 
 <script>
-// Update datetime
-function updateDatetime() {
-    document.getElementById('datetime').textContent = new Date().toLocaleString();
+let songs00s = [];
+
+fetch("00s_songs.json")
+  .then(res => res.json())
+  .then(data => {
+    songs00s = data;
+    populatePlaylist();
+  })
+  .catch(err => console.error("Error loading songs:", err));
+
+function populatePlaylist() {
+  const playlistDiv = document.getElementById("playlist");
+  playlistDiv.innerHTML = "";
+  
+  songs00s.forEach((song, index) => {
+    const div = document.createElement("div");
+    div.textContent = `${song.title} - ${song.artist.replace("_","")}`;
+    div.className = "playlist-item";
+    div.addEventListener("click", () => playSong(index));
+    playlistDiv.appendChild(div);
+  });
 }
-setInterval(updateDatetime, 1000);
-updateDatetime();
 
-// Card checker (mock)
-document.getElementById('checkCard').addEventListener('click', () => {
-    const cardNum = document.getElementById('cardNumber').value;
-    document.getElementById('cardDisplay').innerHTML = `<p>Displaying Bingo Card #${cardNum} (mock)</p>`;
-});
+function playSong(index) {
+  const song = songs00s[index];
+  const player = document.getElementById("audio-player");
+  player.src = song.file;
+  player.play();
+}
 
-// Playlist data embedded directly
-const songs00s = [
-  { "title": "Oops!... I Did It Again", "artist": "Britney Spears", "file": "00s/01_oops.mp3" },
-  { "title": "Bye Bye Bye", "artist": "NSYNC", "file": "00s/02_bye_bye_bye.mp3" },
-  { "title": "Genie in a Bottle", "artist": "Christina Aguilera", "file": "00s/03_genie.mp3" },
-  { "title": "I Want It That Way", "artist": "Backstreet Boys", "file": "00s/04_i_want_it_that_way.mp3" },
-  { "title": "Torn", "artist": "Natalie Imbruglia", "file": "00s/05_torn.mp3" },
-  { "title": "MMMBop", "artist": "Hanson", "file": "00s/06_mmmbop.mp3" },
-  { "title": "Livin' la Vida Loca", "artist": "Ricky Martin", "file": "00s/07_livin_la_vida_loca.mp3" },
-  { "title": "All Star", "artist": "Smash Mouth", "file": "00s/08_all_star.mp3" },
-  { "title": "Waterfalls", "artist": "TLC", "file": "00s/09_waterfalls.mp3" },
-  { "title": "I’ll Be Missing You", "artist": "Puff Daddy", "file": "00s/10_ill_be_missing_you.mp3" }
-  // Add all remaining songs following the same format
-];
-
-const playlistEl = document.getElementById("playlist");
-const audioPlayer = document.getElementById("audioPlayer");
-
-// Populate playlist
-songs00s.forEach((song, index) => {
-    const li = document.createElement("li");
-    li.textContent = `${song.title} - ${song.artist}`;
-    li.addEventListener("click", () => {
-        audioPlayer.src = song.file;
-        audioPlayer.play().catch(err => console.error("Playback error:", err));
-    });
-    playlistEl.appendChild(li);
-});
-
-// Play random
 document.getElementById("play-random").addEventListener("click", () => {
-    const randomIndex = Math.floor(Math.random() * songs00s.length);
-    audioPlayer.src = songs00s[randomIndex].file;
-    audioPlayer.play().catch(err => console.error("Playback error:", err));
+  const randomIndex = Math.floor(Math.random() * songs00s.length);
+  playSong(randomIndex);
 });
 </script>
 
